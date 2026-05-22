@@ -10,7 +10,7 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - drafted the first canonical KSB migration in `schema/002_ksb_canonical.sql`
 - updated the schema apply script to run numbered migrations in order
 - added the first `/api/v1` KSB protocol routes for app registration, canonical bond list, and canonical bond detail reads
-- added canonical `/api/v1` proof submission, contest handling, release/slash execution, party-history, party-score, lightweight status polling, first cron resolver routes, a party-history rebuild route, verifier-rule listing, first operator-route auth enforcement, signed execution-payload validation, and cryptographic execution-signature verification
+- added canonical `/api/v1` proof submission, contest handling, release/slash execution, party-history, party-score, lightweight status polling, first cron resolver routes, a party-history rebuild route, verifier-rule listing, operator-gated app registration and maintenance routes, signed execution-payload validation, and cryptographic execution-signature verification
 - added protocol-versioned response handling for `/api/v1`
 - added authenticated canonical bond creation under `POST /api/v1/bonds`
 - created `bonds/` workspace folder
@@ -53,4 +53,4 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Decide whether app registration should be gated separately, with verifier-role attribution now narrowed to explicit known config fields.
+Define a deliberate self-service onboarding path only if public app registration is actually wanted later.

@@ -32,6 +32,7 @@ Every route:
   - accepts `x-ksb-api-key: <api-key>` or `Authorization: Bearer <api-key>`
 
 ### Operator-authenticated routes
+- `POST /api/v1/apps/register`
 - `POST /api/v1/bonds/:bondId/release`
 - `POST /api/v1/bonds/:bondId/slash`
 - `POST /api/v1/cron/resolve-expired`
@@ -54,6 +55,9 @@ Execution-signature verification currently requires:
 ### `POST /api/v1/apps/register`
 Registers an application for KSB usage.
 
+Authentication:
+- operator API key required
+
 Request body:
 - `name` required
 - `contact` optional
@@ -63,6 +67,9 @@ Request body:
 Response:
 - registered app record
 - generated API key returned once at creation time
+
+Note:
+- app registration is now treated as operator-controlled bootstrap, not a public self-service route
 
 ### `GET /api/v1/bonds`
 Lists canonical KSB bonds.
@@ -322,5 +329,5 @@ This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
 ## Next recommended slice
 
-1. decide whether app registration should also be gated or bootstrapped separately
-2. stronger verifier-role attribution semantics beyond heuristic config parsing
+1. define a deliberate self-service onboarding path if public app registration is desired later
+2. consider whether issue #4 is complete enough to close after the verifier-attribution tightening
