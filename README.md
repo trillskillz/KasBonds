@@ -118,6 +118,29 @@ Main values used in this repo include:
 - `TN12_PRIVATE_KEY`
 - verifier/slash/operator destination addresses
 
+## Build on KSB
+
+The recommended way to integrate is the published TypeScript SDK,
+[`ksb-sdk`](https://www.npmjs.com/package/ksb-sdk). It wraps the whole
+`/api/v1` surface with typed methods, so reach for it before calling the
+HTTP API directly.
+
+```bash
+npm install ksb-sdk
+```
+
+```ts
+import { KsbClient } from 'ksb-sdk';
+
+const ksb = new KsbClient({ baseUrl: 'https://ksb.example', apiKey: '...' });
+const bond = await ksb.getBond('bond_...');
+```
+
+Runnable examples live in `sdk/examples/`, and `references/` holds full
+standalone reference integrations for the agent SLA, bug bounty, and
+personal commitment use cases. The raw routes below are the surface the SDK
+is built on.
+
 ## API surface
 
 Current KSB protocol routes:
@@ -145,7 +168,7 @@ Details live in `docs/KSB_API_V1.md`.
 
 Protocol artifacts:
 - OpenAPI: `docs/openapi/ksb-v1.openapi.yaml`
-- SDK skeleton: `sdk/`
+- SDK source: `sdk/` (published as [`ksb-sdk`](https://www.npmjs.com/package/ksb-sdk))
 
 SDK helpers:
 - `npm run sdk:typecheck`
