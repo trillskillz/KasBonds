@@ -1,0 +1,111 @@
+# KasBonds
+
+KasBonds is a reference implementation of the **Kaspa Service Bond Protocol (KSB)**.
+
+KSB is a Kaspa-native bond primitive for trust-minimized service commitments:
+- a provider stakes KAS against a promise
+- proof is submitted and verified
+- the bond is either released or slashed based on outcome
+- slash routing is policy-driven and protocol-aware
+
+This repo currently combines:
+- a **TN12 covenant proof harness**
+- a **Next.js reference app**
+- an evolving **`/api/v1` KSB protocol surface**
+- canonical **schema and protocol planning docs**
+
+## Current status
+
+Implemented now:
+- TN12 release-path proof
+- TN12 slash-path proof
+- canonical KSB schema draft
+- app registration route
+- canonical bond create/list/detail routes
+- bond status polling route
+- proof submission route
+- contest route
+
+Still in progress:
+- party history and score endpoints
+- cron resolver routes
+- verifier hub and custom rule execution
+- SDK packaging
+
+See also:
+- `STATUS.md`
+- `PLAN.md`
+- `GAP_ANALYSIS.md`
+- `docs/KSB_API_V1.md`
+
+## Repo layout
+
+- `app/` - Next.js app and API routes
+- `lib/ksb/` - canonical KSB repository + protocol helpers
+- `lib/bonds/` - legacy BondClaw-era reference flow still kept during transition
+- `schema/` - raw SQL schema and rebaseline docs
+- `contracts/` - SilverScript bond contracts
+- `artifacts/` - compiled covenant artifacts
+- `scripts/` - TN12 and schema utility scripts
+- `docs/` - operator and protocol docs
+- `vendor/` - vendored dependencies used by the proof harness
+
+## Quick start
+
+```bash
+npm install
+npm run typecheck
+npm run build
+```
+
+For local app work:
+
+```bash
+npm run dev
+```
+
+For schema application:
+
+```bash
+npm run db:apply
+```
+
+For TN12 proof work, start with:
+- `docs/TN12_HARNESS.md`
+- `docs/OPERATOR_WORKFLOW.md`
+- `COVENANT_SPEC.md`
+
+## Environment
+
+Copy the example env file and fill in the required values:
+
+```bash
+cp .env.example .env.local
+```
+
+Main values used in this repo include:
+- `TURSO_DATABASE_URL`
+- `TURSO_AUTH_TOKEN`
+- `TN12_WRPC_URL`
+- `TN12_NETWORK`
+- `TN12_PRIVATE_KEY`
+- verifier/slash/operator destination addresses
+
+## API surface
+
+Current KSB protocol routes:
+- `POST /api/v1/apps/register`
+- `GET /api/v1/bonds`
+- `POST /api/v1/bonds`
+- `GET /api/v1/bonds/:bondId`
+- `GET /api/v1/bonds/:bondId/status`
+- `POST /api/v1/bonds/:bondId/submit`
+- `POST /api/v1/bonds/:bondId/contest`
+
+Details live in `docs/KSB_API_V1.md`.
+
+## Notes
+
+- The repo is mid-transition from an earlier BondClaw proof app into a cleaner KSB protocol reference implementation.
+- Raw SQL is used through `(db as any).$client.execute()` by design.
+- The vendored dependencies make the repo larger, but keep the proof harness self-contained.
