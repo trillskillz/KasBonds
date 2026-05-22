@@ -47,7 +47,8 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - implemented the verifier hub: a dispatch engine that executes built-in rules (http, content, time, signature, oracle), persists protocol-computed results, and recomputes bond status, exposed through a per-bond dispatch route and a bulk dispatch cron
 - added composable AND/OR verifier rule sets: bonds can declare a `ruleSet` tree, and proof submission, hub dispatch, and the auto-verify cron all derive bond status by evaluating that tree (a flat `rules` array still works as an implicit AND)
 - added custom verifier registration: apps can bind a named rule to their own signed webhook through `POST /api/v1/verifier-rules`, stored in the new `ksb_custom_verifiers` table, and the hub dispatches those rules by calling the webhook for a signed pass or fail verdict
-- prepared the SDK for npm publishing: MIT license, public-scope publish config, repository and package metadata, a prepublish build step, and a lean tarball verified with `npm pack`
+- prepared the SDK for npm publishing: MIT license, publish config, repository and package metadata, a prepublish build step, and a lean tarball verified with `npm pack`
+- published the SDK to npm as `ksb-sdk@0.1.0` (the `@ksb` scope was unavailable, so the package is unscoped), verified with a clean install and ESM import
 - started Phase 7 (reputation): added an ERC-8004 aligned reputation profile that re-shapes a party's KSB history into validation-registry vocabulary (a release is a pass, a slash is a fail), exposed at `GET /api/v1/parties/:addr/reputation`
 
 ## Current blockers
