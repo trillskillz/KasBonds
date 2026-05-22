@@ -162,3 +162,82 @@ export interface KsbBondStatusView {
   };
   lastEvent: KsbBondEventRecord | null;
 }
+
+export interface KsbPartyHistoryRoleView {
+  role: 'provider' | 'counterparty' | 'verifier';
+  totalBondedSompi: string;
+  bondsReleased: number;
+  bondsSlashed: number;
+  totalSlashedValueSompi: string;
+  lastUpdated: string | null;
+}
+
+export interface KsbPartyHistoryAppView {
+  appId: string;
+  appName: string | null;
+  roles: KsbPartyHistoryRoleView[];
+}
+
+export interface KsbPartyHistoryBondRef {
+  publicId: string;
+  appId: string;
+  role: 'provider' | 'counterparty';
+  status: KsbBondStatus;
+  bondAmountSompi: string;
+  createdAt: string;
+}
+
+export interface KsbPartyHistoryView {
+  address: string;
+  summary: {
+    totalBonds: number;
+    asProvider: number;
+    asCounterparty: number;
+    asVerifier: number;
+    released: number;
+    slashed: number;
+    active: number;
+    totalBondedSompi: string;
+    totalSlashedValueSompi: string;
+  };
+  apps: KsbPartyHistoryAppView[];
+  recentBonds: KsbPartyHistoryBondRef[];
+}
+
+export interface KsbPartyScoreAppView {
+  appId: string;
+  appName: string | null;
+  releaseRatio: number | null;
+  slashRatio: number | null;
+  totalBondedSompi: string;
+  totalSlashedValueSompi: string;
+  releasedCount: number;
+  slashedCount: number;
+}
+
+export interface KsbPartyScoreView {
+  address: string;
+  score: {
+    releaseRatio: number | null;
+    slashRatio: number | null;
+    activeRiskIndicator: number;
+    totalBondedSompi: string;
+    totalSlashedValueSompi: string;
+    releasedCount: number;
+    slashedCount: number;
+    verifierActivityCount: number;
+  };
+  subScores: KsbPartyScoreAppView[];
+  compatibility: {
+    standard: 'erc-8004-compatible-shape-pending';
+    status: 'partial';
+  };
+}
+
+export interface KsbCronRunResult {
+  action: 'resolve-expired' | 'auto-verify';
+  scanned: number;
+  updated: number;
+  bondIds: string[];
+  at: string;
+}

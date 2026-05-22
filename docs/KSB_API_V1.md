@@ -12,6 +12,10 @@ Current routes:
 - `POST /api/v1/bonds/:bondId/submit`
 - `POST /api/v1/bonds/:bondId/contest`
 - `GET /api/v1/bonds/:bondId/status`
+- `GET /api/v1/parties/:addr`
+- `GET /api/v1/parties/:addr/score`
+- `POST /api/v1/cron/resolve-expired`
+- `POST /api/v1/cron/auto-verify`
 
 Every route:
 - exports `export const dynamic = 'force-dynamic'`
@@ -125,6 +129,62 @@ Behavior:
   - `arbitration` when `moveToArbitration` is true
 - appends a bond event recording the dispute
 
+### `GET /api/v1/parties/:addr`
+Reads public participation history for an address.
+
+Returns:
+- address summary totals
+- per-app role breakdown from `ksb_party_history`
+- recent bond participation as provider or counterparty
+
+Notes:
+- this first slice prefers useful public history over perfect completeness
+- verifier role totals come from `ksb_party_history`
+- recent bond activity is derived from canonical `ksb_bonds`
+
+### `GET /api/v1/parties/:addr/score`
+Reads a public reputation-style score view for an address.
+
+Returns:
+- overall release ratio
+- overall slash ratio
+- active risk indicator
+- total bonded and slashed value summaries
+- per-app sub-scores
+- a partial ERC-8004 compatibility marker
+
+Notes:
+- this is the first scoring slice, not a final reputation model
+- current inputs come from `ksb_party_history` plus derived activity totals
+- output shape is intentionally pointed toward future ERC-8004 compatibility
+
+### `POST /api/v1/cron/resolve-expired`
+Resolver route for timeout transitions.
+
+Behavior:
+- scans canonical bonds in `proposed`, `committed`, `active`, `verified`, or `failed`
+- marks bonds past `deadlineUnix` as `timed_out`
+- appends a resolver event per updated bond
+- intended to be idempotent through status guards
+
+Optional request body:
+- `nowUnix` to override current time for testing
+
+### `POST /api/v1/cron/auto-verify`
+Resolver route that derives lifecycle status from verification rows.
+
+Behavior:
+- scans canonical bonds with active or recently derived statuses
+- reads `ksb_verifications`
+- applies this precedence:
+  - `contested`
+  - `failed`
+  - `timed_out`
+  - `verified` when all rows passed
+  - otherwise `active`
+- appends a resolver event when a status changes
+- intended to be idempotent through no-op status checks
+
 ### `GET /api/v1/bonds/:bondId/status`
 Reads a lighter-weight status polling view for a canonical KSB bond.
 
@@ -139,10 +199,7 @@ Returns:
 
 This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
-It does not yet include:
-- score or history APIs
-- cron resolver routes
-
 ## Next recommended slice
 
-1. score, history, and cron resolver routes
+1. canonical release/slash execution endpoints for KSB lifecycle completion
+2. party-history backfill/update flows

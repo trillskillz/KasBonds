@@ -6,6 +6,9 @@ import type {
   KsbBondEventRecord,
   KsbBondRecord,
   KsbBondStatusView,
+  KsbPartyHistoryView,
+  KsbPartyScoreView,
+  KsbCronRunResult,
   KsbSlashingEventRecord,
   KsbVerificationRecord,
   RegisterAppInput,
@@ -210,6 +213,10 @@ function rowToBondEvent(row: any): KsbBondEventRecord {
     dataJson: row.data_json ?? null,
     createdAt: String(row.created_at),
   };
+}
+
+function addSompiStrings(a: string, b: string) {
+  return (BigInt(a || '0') + BigInt(b || '0')).toString();
 }
 
 async function addKsbBondEvent(
@@ -727,4 +734,301 @@ export async function contestKsbBond(db: any, idOrPublicId: string, input: Conte
   );
 
   return getKsbBondDetail(db, bond.id);
+}
+
+export async function getKsbPartyHistory(db: any, address: string): Promise<KsbPartyHistoryView> {
+  const normalizedAddress = address.trim();
+  if (!normalizedAddress) {
+    throw new Error('address is required');
+  }
+
+  const [historyResult, providerBondResult, counterpartyBondResult] = await Promise.all([
+    (db as any).$client.execute({
+      sql: `
+        SELECT h.*, a.name AS app_name
+        FROM ksb_party_history h
+        LEFT JOIN ksb_registered_apps a ON a.app_id = h.app_id
+        WHERE h.address = :address
+        ORDER BY h.app_id, h.role
+      `,
+      args: { address: normalizedAddress },
+    }),
+    (db as any).$client.execute({
+      sql: `
+        SELECT public_id, app_id, status, bond_amount_sompi, created_at
+        FROM ksb_bonds
+        WHERE provider_address = :address
+        ORDER BY created_at DESC
+        LIMIT 25
+      `,
+      args: { address: normalizedAddress },
+    }),
+    (db as any).$client.execute({
+      sql: `
+        SELECT public_id, app_id, status, bond_amount_sompi, created_at
+        FROM ksb_bonds
+        WHERE counterparty_address = :address
+        ORDER BY created_at DESC
+        LIMIT 25
+      `,
+      args: { address: normalizedAddress },
+    }),
+  ]);
+
+  const appMap = new Map<string, { appId: string; appName: string | null; roles: Array<any> }>();
+  let released = 0;
+  let slashed = 0;
+  let totalBondedSompi = '0';
+  let totalSlashedValueSompi = '0';
+  let asVerifier = 0;
+
+  for (const row of historyResult.rows) {
+    const appId = String(row.app_id);
+    if (!appMap.has(appId)) {
+      appMap.set(appId, { appId, appName: row.app_name ?? null, roles: [] });
+    }
+
+    const role = String(row.role) as 'provider' | 'counterparty' | 'verifier';
+    const roleView = {
+      role,
+      totalBondedSompi: String(row.total_bonded_sompi),
+      bondsReleased: Number(row.bonds_released),
+      bondsSlashed: Number(row.bonds_slashed),
+      totalSlashedValueSompi: String(row.total_slashed_value_sompi),
+      lastUpdated: row.last_updated ? String(row.last_updated) : null,
+    };
+    appMap.get(appId)!.roles.push(roleView);
+
+    released += roleView.bondsReleased;
+    slashed += roleView.bondsSlashed;
+    totalBondedSompi = addSompiStrings(totalBondedSompi, roleView.totalBondedSompi);
+    totalSlashedValueSompi = addSompiStrings(totalSlashedValueSompi, roleView.totalSlashedValueSompi);
+    if (role === 'verifier') asVerifier += roleView.bondsReleased + roleView.bondsSlashed;
+  }
+
+  const recentBonds = [
+    ...providerBondResult.rows.map((row: any) => ({
+      publicId: String(row.public_id),
+      appId: String(row.app_id),
+      role: 'provider' as const,
+      status: row.status,
+      bondAmountSompi: String(row.bond_amount_sompi),
+      createdAt: String(row.created_at),
+    })),
+    ...counterpartyBondResult.rows.map((row: any) => ({
+      publicId: String(row.public_id),
+      appId: String(row.app_id),
+      role: 'counterparty' as const,
+      status: row.status,
+      bondAmountSompi: String(row.bond_amount_sompi),
+      createdAt: String(row.created_at),
+    })),
+  ]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 25);
+
+  const uniqueBonds = new Set(recentBonds.map((bond) => `${bond.role}:${bond.publicId}`));
+  const totalBonds = uniqueBonds.size;
+  const asProvider = recentBonds.filter((bond) => bond.role === 'provider').length;
+  const asCounterparty = recentBonds.filter((bond) => bond.role === 'counterparty').length;
+  const active = recentBonds.filter((bond) => ['proposed', 'committed', 'active', 'verified', 'failed', 'timed_out', 'contested', 'arbitration'].includes(bond.status)).length;
+
+  return {
+    address: normalizedAddress,
+    summary: {
+      totalBonds,
+      asProvider,
+      asCounterparty,
+      asVerifier,
+      released,
+      slashed,
+      active,
+      totalBondedSompi,
+      totalSlashedValueSompi,
+    },
+    apps: Array.from(appMap.values()),
+    recentBonds,
+  };
+}
+
+export async function getKsbPartyScore(db: any, address: string): Promise<KsbPartyScoreView> {
+  const history = await getKsbPartyHistory(db, address);
+
+  let releasedCount = 0;
+  let slashedCount = 0;
+  let verifierActivityCount = 0;
+
+  const subScores = history.apps.map((app) => {
+    let appReleased = 0;
+    let appSlashed = 0;
+    let appTotalBondedSompi = '0';
+    let appTotalSlashedValueSompi = '0';
+
+    for (const role of app.roles) {
+      appReleased += role.bondsReleased;
+      appSlashed += role.bondsSlashed;
+      appTotalBondedSompi = addSompiStrings(appTotalBondedSompi, role.totalBondedSompi);
+      appTotalSlashedValueSompi = addSompiStrings(appTotalSlashedValueSompi, role.totalSlashedValueSompi);
+      if (role.role === 'verifier') {
+        verifierActivityCount += role.bondsReleased + role.bondsSlashed;
+      }
+    }
+
+    releasedCount += appReleased;
+    slashedCount += appSlashed;
+    const resolved = appReleased + appSlashed;
+
+    return {
+      appId: app.appId,
+      appName: app.appName,
+      releaseRatio: resolved > 0 ? appReleased / resolved : null,
+      slashRatio: resolved > 0 ? appSlashed / resolved : null,
+      totalBondedSompi: appTotalBondedSompi,
+      totalSlashedValueSompi: appTotalSlashedValueSompi,
+      releasedCount: appReleased,
+      slashedCount: appSlashed,
+    };
+  });
+
+  const resolvedCount = releasedCount + slashedCount;
+
+  return {
+    address: history.address,
+    score: {
+      releaseRatio: resolvedCount > 0 ? releasedCount / resolvedCount : null,
+      slashRatio: resolvedCount > 0 ? slashedCount / resolvedCount : null,
+      activeRiskIndicator: history.summary.totalBonds > 0 ? history.summary.active / history.summary.totalBonds : 0,
+      totalBondedSompi: history.summary.totalBondedSompi,
+      totalSlashedValueSompi: history.summary.totalSlashedValueSompi,
+      releasedCount,
+      slashedCount,
+      verifierActivityCount,
+    },
+    subScores,
+    compatibility: {
+      standard: 'erc-8004-compatible-shape-pending',
+      status: 'partial',
+    },
+  };
+}
+
+export async function resolveExpiredKsbBonds(db: any, nowUnix = Math.floor(Date.now() / 1000)): Promise<KsbCronRunResult> {
+  const result = await (db as any).$client.execute({
+    sql: `
+      SELECT id, public_id, status, deadline_unix
+      FROM ksb_bonds
+      WHERE status IN ('proposed', 'committed', 'active', 'verified', 'failed')
+        AND deadline_unix <= :nowUnix
+      ORDER BY deadline_unix ASC
+      LIMIT 200
+    `,
+    args: { nowUnix },
+  });
+
+  const bondIds: string[] = [];
+
+  for (const row of result.rows) {
+    const bondId = String(row.id);
+    const publicId = String(row.public_id);
+
+    await (db as any).$client.execute({
+      sql: `
+        UPDATE ksb_bonds
+        SET status = 'timed_out'
+        WHERE id = :bondId
+          AND status IN ('proposed', 'committed', 'active', 'verified', 'failed')
+          AND deadline_unix <= :nowUnix
+      `,
+      args: { bondId, nowUnix },
+    });
+
+    await addKsbBondEvent(
+      db,
+      bondId,
+      'bond_timed_out',
+      'system',
+      null,
+      'Resolver marked bond as timed out',
+      JSON.stringify({ publicId, deadlineUnix: Number(row.deadline_unix), resolver: 'resolve-expired' }),
+    );
+
+    bondIds.push(publicId);
+  }
+
+  return {
+    action: 'resolve-expired',
+    scanned: result.rows.length,
+    updated: bondIds.length,
+    bondIds,
+    at: new Date().toISOString(),
+  };
+}
+
+export async function autoVerifyKsbBonds(db: any): Promise<KsbCronRunResult> {
+  const bondsResult = await (db as any).$client.execute({
+    sql: `
+      SELECT id, public_id, status
+      FROM ksb_bonds
+      WHERE status IN ('proposed', 'committed', 'active', 'verified', 'failed', 'contested', 'timed_out')
+      ORDER BY updated_at ASC
+      LIMIT 200
+    `,
+    args: {},
+  });
+
+  const bondIds: string[] = [];
+
+  for (const row of bondsResult.rows) {
+    const bondId = String(row.id);
+    const publicId = String(row.public_id);
+    const currentStatus = String(row.status);
+    const verificationsResult = await (db as any).$client.execute({
+      sql: `SELECT result FROM ksb_verifications WHERE bond_id = :bondId`,
+      args: { bondId },
+    });
+
+    const results = verificationsResult.rows.map((verificationRow: any) => String(verificationRow.result));
+    if (!results.length) {
+      continue;
+    }
+
+    const nextStatus = results.includes('contested')
+      ? 'contested'
+      : results.includes('failed')
+        ? 'failed'
+        : results.includes('timed_out')
+          ? 'timed_out'
+          : results.every((entry: string) => entry === 'passed')
+            ? 'verified'
+            : 'active';
+
+    if (nextStatus === currentStatus) {
+      continue;
+    }
+
+    await (db as any).$client.execute({
+      sql: `UPDATE ksb_bonds SET status = :status WHERE id = :bondId`,
+      args: { status: nextStatus, bondId },
+    });
+
+    await addKsbBondEvent(
+      db,
+      bondId,
+      'bond_auto_verified',
+      'system',
+      null,
+      'Resolver updated bond status from verification results',
+      JSON.stringify({ publicId, from: currentStatus, to: nextStatus, resolver: 'auto-verify' }),
+    );
+
+    bondIds.push(publicId);
+  }
+
+  return {
+    action: 'auto-verify',
+    scanned: bondsResult.rows.length,
+    updated: bondIds.length,
+    bondIds,
+    at: new Date().toISOString(),
+  };
 }
