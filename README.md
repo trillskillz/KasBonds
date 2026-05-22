@@ -33,10 +33,10 @@ Implemented now:
 - composable AND/OR verifier rule sets
 - custom verifier registration (app-owned signed webhooks)
 - initial OpenAPI spec
-- initial SDK skeleton
+- publish-ready `@ksb/sdk` package
 
 Still in progress:
-- SDK packaging and npm publishing
+- publishing `@ksb/sdk` to npm
 
 See also:
 - `STATUS.md`

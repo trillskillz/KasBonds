@@ -1,9 +1,29 @@
 {
   "name": "@ksb/sdk",
   "version": "0.1.0",
-  "private": true,
+  "description": "TypeScript SDK for the Kaspa Service Bond Protocol (KSB)",
+  "license": "MIT",
+  "author": "KasBonds contributors",
+  "homepage": "https://github.com/trillskillz/KasBonds/tree/main/sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trillskillz/KasBonds.git",
+    "directory": "sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/trillskillz/KasBonds/issues"
+  },
+  "keywords": [
+    "kaspa",
+    "ksb",
+    "bond",
+    "covenant",
+    "sla",
+    "escrow",
+    "verifier",
+    "sdk"
+  ],
   "type": "module",
-  "description": "Initial SDK for the Kaspa Service Bonds API",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -12,14 +32,24 @@
       "import": "./dist/index.js"
     }
   },
+  "sideEffects": false,
   "files": [
     "dist",
-    "README.md"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "examples:typecheck": "tsc -p tsconfig.examples.json"
+    "examples:typecheck": "tsc -p tsconfig.examples.json",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

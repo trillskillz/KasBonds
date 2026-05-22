@@ -1,6 +1,6 @@
 # @ksb/sdk
 
-Initial SDK for the Kaspa Service Bonds protocol.
+TypeScript SDK for the Kaspa Service Bond Protocol (KSB). MIT licensed.
 
 ## Current scope
 
@@ -8,7 +8,7 @@ This pass provides:
 - typed request/response interfaces
 - a small `KsbClient` wrapper around the current `/api/v1` HTTP surface
 - app-authenticated and operator-authenticated request helpers
-- a local TypeScript build layout
+- a TypeScript build layout configured for npm publishing
 - launch-grade examples under `examples/`
 
 It is still intentionally thin. The goal is to stabilize the protocol surface before polishing ergonomics.
@@ -83,10 +83,35 @@ app-registered custom rules. `registerVerifierRule()` (app authenticated)
 binds a named rule to an app-owned signed webhook that the verifier hub calls
 for a pass or fail verdict.
 
+## Publishing
+
+The package is configured for npm publishing under the public `@ksb` scope.
+
+Releasing a version:
+
+```bash
+cd sdk
+npm version <patch|minor|major>
+npm publish
+```
+
+`prepublishOnly` rebuilds `dist/` before the package is published, and
+`publishConfig.access` is set to `public` so the scoped package is published
+publicly. The published tarball ships `dist/`, the TypeScript source, the
+README, and the license; examples and build config are excluded.
+
+Verify the contents of a release without publishing:
+
+```bash
+npm pack --dry-run
+```
+
+Publishing requires npm auth with rights to the `@ksb` scope. KSB is MIT
+licensed and intended as public ecosystem infrastructure.
+
 ## Next SDK work
 
 - spec-to-code validation against `docs/openapi/ksb-v1.openapi.yaml`
-- publishing workflow
 - richer auth helpers
 - signing helpers for release/slash execution payloads
 - a personal commitment reference example

@@ -1,0 +1,8 @@
+# The published package ships the compiled output plus the TypeScript source
+# so that the declaration and source maps resolve. The `files` field in
+# package.json is the allowlist; this file also ensures the build output in
+# `dist` is not excluded by the repo-level `.gitignore`.
+examples
+tsconfig.json
+tsconfig.examples.json
+.gitignore

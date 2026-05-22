@@ -47,6 +47,7 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - implemented the verifier hub: a dispatch engine that executes built-in rules (http, content, time, signature, oracle), persists protocol-computed results, and recomputes bond status, exposed through a per-bond dispatch route and a bulk dispatch cron
 - added composable AND/OR verifier rule sets: bonds can declare a `ruleSet` tree, and proof submission, hub dispatch, and the auto-verify cron all derive bond status by evaluating that tree (a flat `rules` array still works as an implicit AND)
 - added custom verifier registration: apps can bind a named rule to their own signed webhook through `POST /api/v1/verifier-rules`, stored in the new `ksb_custom_verifiers` table, and the hub dispatches those rules by calling the webhook for a signed pass or fail verdict
+- prepared the SDK for npm publishing: MIT license, public-scope publish config, repository and package metadata, a prepublish build step, and a lean tarball verified with `npm pack`
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -58,4 +59,4 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Prepare the SDK for npm publishing and document the custom verifier webhook contract for integrators.
+Publish `@ksb/sdk` to npm under the public `@ksb` scope, then start the Phase 7 reputation work.
