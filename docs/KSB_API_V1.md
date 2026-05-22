@@ -25,6 +25,25 @@ Every route:
 - exports `export const dynamic = 'force-dynamic'`
 - returns `X-KSB-Protocol-Version`
 
+## Current auth model
+
+### App-authenticated route
+- `POST /api/v1/bonds`
+  - accepts `x-ksb-api-key: <api-key>` or `Authorization: Bearer <api-key>`
+
+### Operator-authenticated routes
+- `POST /api/v1/bonds/:bondId/release`
+- `POST /api/v1/bonds/:bondId/slash`
+- `POST /api/v1/cron/resolve-expired`
+- `POST /api/v1/cron/auto-verify`
+- `POST /api/v1/cron/rebuild-party-history`
+
+Operator auth currently requires:
+- `KSB_OPERATOR_API_KEY` configured in the environment
+- `x-ksb-operator-key: <key>` or `Authorization: Bearer <key>`
+
+If `KSB_OPERATOR_API_KEY` is unset, those routes return `503` rather than staying silently open.
+
 ## Route details
 
 ### `POST /api/v1/apps/register`
@@ -136,6 +155,9 @@ Behavior:
 ### `POST /api/v1/bonds/:bondId/release`
 Records canonical release execution after a verified outcome.
 
+Authentication:
+- operator API key required
+
 Allowed from:
 - `verified`
 - `released` for idempotent replay/update
@@ -153,6 +175,9 @@ Behavior:
 
 ### `POST /api/v1/bonds/:bondId/slash`
 Records canonical slash execution after a failed, timed out, or disputed outcome.
+
+Authentication:
+- operator API key required
 
 Allowed from:
 - `failed`
@@ -210,6 +235,9 @@ Notes:
 ### `POST /api/v1/cron/resolve-expired`
 Resolver route for timeout transitions.
 
+Authentication:
+- operator API key required
+
 Behavior:
 - scans canonical bonds in `proposed`, `committed`, `active`, `verified`, or `failed`
 - marks bonds past `deadlineUnix` as `timed_out`
@@ -221,6 +249,9 @@ Optional request body:
 
 ### `POST /api/v1/cron/auto-verify`
 Resolver route that derives lifecycle status from verification rows.
+
+Authentication:
+- operator API key required
 
 Behavior:
 - scans canonical bonds with active or recently derived statuses
@@ -236,6 +267,9 @@ Behavior:
 
 ### `POST /api/v1/cron/rebuild-party-history`
 Maintenance route that rebuilds `ksb_party_history` from canonical KSB tables.
+
+Authentication:
+- operator API key required
 
 Behavior:
 - clears current `ksb_party_history`
@@ -270,5 +304,5 @@ This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
 ## Next recommended slice
 
-1. auth/signature expectations for operator-facing resolution and maintenance routes
+1. add signature-backed execution payload expectations for release/slash routes
 2. stronger verifier-role attribution semantics beyond heuristic config parsing

@@ -1,11 +1,16 @@
 import { getDb } from '../../../../../lib/db/client';
-import { ksbJson } from '../../../../../lib/ksb/protocol';
+import { ksbJson, requireKsbOperator } from '../../../../../lib/ksb/protocol';
 import { resolveExpiredKsbBonds } from '../../../../../lib/ksb/repository';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
+    const auth = requireKsbOperator(request);
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const body = await request.json().catch(() => ({}));
     const nowUnix = Number(body?.nowUnix);
     const db = getDb();

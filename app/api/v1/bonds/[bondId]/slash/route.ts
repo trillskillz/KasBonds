@@ -1,5 +1,5 @@
 import { getDb } from '../../../../../../lib/db/client';
-import { ksbJson } from '../../../../../../lib/ksb/protocol';
+import { ksbJson, requireKsbOperator } from '../../../../../../lib/ksb/protocol';
 import { recordKsbSlashExecution } from '../../../../../../lib/ksb/repository';
 import type { RecordKsbSlashExecutionInput } from '../../../../../../lib/ksb/types';
 
@@ -10,6 +10,11 @@ export async function POST(
   context: { params: Promise<{ bondId: string }> },
 ) {
   try {
+    const auth = requireKsbOperator(request);
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const { bondId } = await context.params;
     const body = (await request.json()) as RecordKsbSlashExecutionInput;
     const db = getDb();
