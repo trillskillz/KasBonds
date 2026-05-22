@@ -75,6 +75,21 @@ export interface ContestKsbBondInput {
   moveToArbitration?: boolean;
 }
 
+export interface RecordKsbReleaseExecutionInput {
+  resolutionTxHash: string;
+  actorId?: string | null;
+  summary?: string | null;
+}
+
+export interface RecordKsbSlashExecutionInput {
+  resolutionTxHash: string;
+  reason: string;
+  slashAmountSompi: string;
+  distributionJson: string | Record<string, unknown>;
+  actorId?: string | null;
+  summary?: string | null;
+}
+
 export interface KsbBondRecord {
   id: string;
   publicId: string;

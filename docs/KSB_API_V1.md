@@ -11,6 +11,8 @@ Current routes:
 - `GET /api/v1/bonds/:bondId`
 - `POST /api/v1/bonds/:bondId/submit`
 - `POST /api/v1/bonds/:bondId/contest`
+- `POST /api/v1/bonds/:bondId/release`
+- `POST /api/v1/bonds/:bondId/slash`
 - `GET /api/v1/bonds/:bondId/status`
 - `GET /api/v1/parties/:addr`
 - `GET /api/v1/parties/:addr/score`
@@ -129,6 +131,49 @@ Behavior:
   - `arbitration` when `moveToArbitration` is true
 - appends a bond event recording the dispute
 
+### `POST /api/v1/bonds/:bondId/release`
+Records canonical release execution after a verified outcome.
+
+Allowed from:
+- `verified`
+- `released` for idempotent replay/update
+
+Request body:
+- `resolutionTxHash`
+- optional `actorId`
+- optional `summary`
+
+Behavior:
+- writes `resolution_tx_hash`
+- moves status to `released`
+- stamps `resolved_at`
+- updates party release counters on first terminal transition
+
+### `POST /api/v1/bonds/:bondId/slash`
+Records canonical slash execution after a failed, timed out, or disputed outcome.
+
+Allowed from:
+- `failed`
+- `timed_out`
+- `contested`
+- `arbitration`
+- `slashed` for idempotent replay/update
+
+Request body:
+- `resolutionTxHash`
+- `reason`
+- `slashAmountSompi`
+- `distributionJson`
+- optional `actorId`
+- optional `summary`
+
+Behavior:
+- writes `resolution_tx_hash`
+- moves status to `slashed`
+- upserts `ksb_slashing_events`
+- stamps `resolved_at`
+- updates party slash counters on first terminal transition
+
 ### `GET /api/v1/parties/:addr`
 Reads public participation history for an address.
 
@@ -201,5 +246,5 @@ This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
 ## Next recommended slice
 
-1. canonical release/slash execution endpoints for KSB lifecycle completion
-2. party-history backfill/update flows
+1. party-history backfill/update flows
+2. auth/signature expectations for operator-facing resolution routes

@@ -9,6 +9,8 @@ import type {
   KsbPartyHistoryView,
   KsbPartyScoreView,
   KsbCronRunResult,
+  RecordKsbReleaseExecutionInput,
+  RecordKsbSlashExecutionInput,
   KsbSlashingEventRecord,
   KsbVerificationRecord,
   RegisterAppInput,
@@ -269,6 +271,43 @@ async function ensureVerifierRule(db: any, rule: { ruleName: string; verifierTyp
       defaultTimeoutMs: 300000,
     },
   });
+}
+
+async function upsertKsbPartyResolution(
+  db: any,
+  bond: KsbBondRecord,
+  outcome: 'released' | 'slashed',
+  slashAmountSompi?: string,
+) {
+  const roles = [
+    { address: bond.providerAddress, role: 'provider' },
+    { address: bond.counterpartyAddress, role: 'counterparty' },
+  ] as const;
+
+  for (const entry of roles) {
+    await (db as any).$client.execute({
+      sql: `
+        INSERT INTO ksb_party_history (
+          address, app_id, role, total_bonded_sompi, bonds_released, bonds_slashed, total_slashed_value_sompi
+        ) VALUES (
+          :address, :appId, :role, '0', :bondsReleased, :bondsSlashed, :totalSlashedValueSompi
+        )
+        ON CONFLICT(address, app_id, role) DO UPDATE SET
+          bonds_released = ksb_party_history.bonds_released + :bondsReleased,
+          bonds_slashed = ksb_party_history.bonds_slashed + :bondsSlashed,
+          total_slashed_value_sompi = CAST(CAST(ksb_party_history.total_slashed_value_sompi AS INTEGER) + CAST(:totalSlashedValueSompi AS INTEGER) AS TEXT),
+          last_updated = CURRENT_TIMESTAMP
+      `,
+      args: {
+        address: entry.address,
+        appId: bond.appId,
+        role: entry.role,
+        bondsReleased: outcome === 'released' ? 1 : 0,
+        bondsSlashed: outcome === 'slashed' ? 1 : 0,
+        totalSlashedValueSompi: outcome === 'slashed' ? slashAmountSompi ?? '0' : '0',
+      },
+    });
+  }
 }
 
 export async function registerApp(db: any, input: RegisterAppInput): Promise<RegisteredAppSecret> {
@@ -734,6 +773,119 @@ export async function contestKsbBond(db: any, idOrPublicId: string, input: Conte
   );
 
   return getKsbBondDetail(db, bond.id);
+}
+
+export async function recordKsbReleaseExecution(
+  db: any,
+  idOrPublicId: string,
+  input: RecordKsbReleaseExecutionInput,
+): Promise<KsbBondDetail> {
+  const txHash = input.resolutionTxHash?.trim();
+  if (!txHash) {
+    throw new Error('resolutionTxHash is required');
+  }
+
+  const current = await getKsbBondDetail(db, idOrPublicId);
+  if (!['verified', 'released'].includes(current.bond.status)) {
+    throw new Error(`Release cannot be recorded from status ${current.bond.status}`);
+  }
+
+  const isFirstResolution = current.bond.status !== 'released';
+
+  await (db as any).$client.execute({
+    sql: `
+      UPDATE ksb_bonds
+      SET status = 'released', resolution_tx_hash = :resolutionTxHash, resolved_at = COALESCE(resolved_at, CURRENT_TIMESTAMP)
+      WHERE id = :bondId
+    `,
+    args: { resolutionTxHash: txHash, bondId: current.bond.id },
+  });
+
+  if (isFirstResolution) {
+    await upsertKsbPartyResolution(db, current.bond, 'released');
+    await addKsbBondEvent(
+      db,
+      current.bond.id,
+      'bond_released',
+      'operator',
+      input.actorId?.trim() || null,
+      input.summary?.trim() || 'Release execution recorded',
+      JSON.stringify({ resolutionTxHash: txHash }),
+    );
+  }
+
+  return getKsbBondDetail(db, current.bond.id);
+}
+
+export async function recordKsbSlashExecution(
+  db: any,
+  idOrPublicId: string,
+  input: RecordKsbSlashExecutionInput,
+): Promise<KsbBondDetail> {
+  const txHash = input.resolutionTxHash?.trim();
+  const reason = input.reason?.trim();
+  if (!txHash) {
+    throw new Error('resolutionTxHash is required');
+  }
+  if (!reason) {
+    throw new Error('reason is required');
+  }
+
+  const slashAmountSompi = assertSompiString(input.slashAmountSompi, 'slashAmountSompi');
+  const distributionJson = normalizeJsonInput(input.distributionJson, 'distributionJson', true)!;
+  const current = await getKsbBondDetail(db, idOrPublicId);
+  if (!['failed', 'timed_out', 'contested', 'arbitration', 'slashed'].includes(current.bond.status)) {
+    throw new Error(`Slash cannot be recorded from status ${current.bond.status}`);
+  }
+
+  const isFirstResolution = current.bond.status !== 'slashed';
+
+  await (db as any).$client.execute({
+    sql: `
+      UPDATE ksb_bonds
+      SET status = 'slashed', resolution_tx_hash = :resolutionTxHash, resolved_at = COALESCE(resolved_at, CURRENT_TIMESTAMP)
+      WHERE id = :bondId
+    `,
+    args: { resolutionTxHash: txHash, bondId: current.bond.id },
+  });
+
+  await (db as any).$client.execute({
+    sql: `
+      INSERT INTO ksb_slashing_events (
+        id, bond_id, reason, slash_amount_sompi, distribution_json, slash_tx_hash
+      ) VALUES (
+        :id, :bondId, :reason, :slashAmountSompi, :distributionJson, :slashTxHash
+      )
+      ON CONFLICT(bond_id) DO UPDATE SET
+        reason = excluded.reason,
+        slash_amount_sompi = excluded.slash_amount_sompi,
+        distribution_json = excluded.distribution_json,
+        slash_tx_hash = excluded.slash_tx_hash
+    `,
+    args: {
+      id: current.slashingEvent?.id ?? randomUUID(),
+      bondId: current.bond.id,
+      reason,
+      slashAmountSompi,
+      distributionJson,
+      slashTxHash: txHash,
+    },
+  });
+
+  if (isFirstResolution) {
+    await upsertKsbPartyResolution(db, current.bond, 'slashed', slashAmountSompi ?? '0');
+    await addKsbBondEvent(
+      db,
+      current.bond.id,
+      'bond_slashed',
+      'operator',
+      input.actorId?.trim() || null,
+      input.summary?.trim() || 'Slash execution recorded',
+      JSON.stringify({ resolutionTxHash: txHash, reason, slashAmountSompi }),
+    );
+  }
+
+  return getKsbBondDetail(db, current.bond.id);
 }
 
 export async function getKsbPartyHistory(db: any, address: string): Promise<KsbPartyHistoryView> {
