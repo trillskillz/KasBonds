@@ -1,7 +1,7 @@
 # KSB Status
 
 ## Current phase
-Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol plan and remapping existing work into the new phase model.
+Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB schema, the versioned `/api/v1` protocol surface, the verifier hub with composable rule sets and custom verifier registration, the cron resolvers, and a publish-ready SDK. Phase 7 (reputation) is now underway.
 
 ## What has been started
 - reset the project plan around the KSB infrastructure framing
@@ -48,6 +48,7 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - added composable AND/OR verifier rule sets: bonds can declare a `ruleSet` tree, and proof submission, hub dispatch, and the auto-verify cron all derive bond status by evaluating that tree (a flat `rules` array still works as an implicit AND)
 - added custom verifier registration: apps can bind a named rule to their own signed webhook through `POST /api/v1/verifier-rules`, stored in the new `ksb_custom_verifiers` table, and the hub dispatches those rules by calling the webhook for a signed pass or fail verdict
 - prepared the SDK for npm publishing: MIT license, public-scope publish config, repository and package metadata, a prepublish build step, and a lean tarball verified with `npm pack`
+- started Phase 7 (reputation): added an ERC-8004 aligned reputation profile that re-shapes a party's KSB history into validation-registry vocabulary (a release is a pass, a slash is a fail), exposed at `GET /api/v1/parties/:addr/reputation`
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -59,4 +60,4 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Publish `@ksb/sdk` to npm under the public `@ksb` scope, then start the Phase 7 reputation work.
+Continue Phase 7: pin the reputation payload against the published ERC-8004 schema and add verifier-role reputation, then publish `@ksb/sdk` to npm.

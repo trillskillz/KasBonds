@@ -17,6 +17,7 @@ Current routes:
 - `GET /api/v1/bonds/:bondId/status`
 - `GET /api/v1/parties/:addr`
 - `GET /api/v1/parties/:addr/score`
+- `GET /api/v1/parties/:addr/reputation`
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
 - `POST /api/v1/cron/dispatch-verifiers`
@@ -327,6 +328,29 @@ Notes:
 - this is the first scoring slice, not a final reputation model
 - current inputs come from `ksb_party_history` plus derived activity totals
 - output shape is intentionally pointed toward future ERC-8004 compatibility
+- the dedicated ERC-8004 aligned profile lives at `/api/v1/parties/:addr/reputation`
+
+### `GET /api/v1/parties/:addr/reputation`
+Reads an ERC-8004 aligned reputation profile for an address.
+
+KSB is the Kaspa-native implementation of the ERC-8004 Validation Registry
+pattern (stake-secured re-execution). This endpoint re-shapes a party's KSB
+history into validation-registry vocabulary: each resolved bond is one
+validation, a release is a pass, and a slash is a fail.
+
+Returns:
+- `schema` and `schemaVersion` identifying the payload shape
+- `subject` the party account, registry, and validation pattern
+- `summary` total validations, passed, failed, pending, pass rate, a
+  `reputationScore` from 0 to 100, active risk indicator, and stake totals
+- `signals` per-app validation breakdown
+- `recentValidations` recent resolved or pending bonds as validation records
+- `compatibility` the ERC-8004 standard and validation registry role
+- `generatedAt` timestamp
+
+Notes:
+- `reputationScore` is the pass rate scaled to 0..100, null when nothing has resolved
+- the payload is aligned with the ERC-8004 Validation Registry pattern and is versioned so the exact field shape can be pinned to the published schema
 
 ### `POST /api/v1/cron/resolve-expired`
 Resolver route for timeout transitions.

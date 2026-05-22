@@ -257,6 +257,55 @@ export interface KsbPartyScoreView {
   };
 }
 
+export interface KsbReputationValidationRecord {
+  bondPublicId: string;
+  appId: string;
+  role: 'provider' | 'counterparty';
+  outcome: 'released' | 'slashed' | 'pending';
+  bondAmountSompi: string;
+  createdAt: string;
+}
+
+export interface KsbReputationSignal {
+  appId: string;
+  appName: string | null;
+  validations: number;
+  passed: number;
+  failed: number;
+  passRate: number | null;
+}
+
+/** An ERC-8004 aligned validation-reputation profile for a party. */
+export interface KsbReputationProfile {
+  schema: 'erc-8004/validation-reputation';
+  schemaVersion: string;
+  subject: {
+    account: string;
+    address: string;
+    registry: 'ksb';
+    validationPattern: 'stake-secured-re-execution';
+  };
+  summary: {
+    totalValidations: number;
+    passed: number;
+    failed: number;
+    pending: number;
+    passRate: number | null;
+    reputationScore: number | null;
+    activeRiskIndicator: number;
+    stakeBondedSompi: string;
+    stakeSlashedSompi: string;
+  };
+  signals: KsbReputationSignal[];
+  recentValidations: KsbReputationValidationRecord[];
+  compatibility: {
+    standard: 'erc-8004';
+    registryRole: 'validation';
+    status: 'aligned';
+  };
+  generatedAt: string;
+}
+
 export interface KsbVerifierRuleRecord {
   name: string;
   description: string;
@@ -470,6 +519,10 @@ export class KsbClient {
 
   getPartyScore(address: string) {
     return this.request<KsbPartyScoreView>(`/api/v1/parties/${encodeURIComponent(address)}/score`);
+  }
+
+  getReputationProfile(address: string) {
+    return this.request<KsbReputationProfile>(`/api/v1/parties/${encodeURIComponent(address)}/reputation`);
   }
 
   resolveExpired(nowUnix?: number) {

@@ -32,6 +32,7 @@ Implemented now:
 - verifier hub dispatch (protocol-computed rule execution)
 - composable AND/OR verifier rule sets
 - custom verifier registration (app-owned signed webhooks)
+- ERC-8004 aligned party reputation profiles
 - initial OpenAPI spec
 - publish-ready `@ksb/sdk` package
 
@@ -112,6 +113,7 @@ Current KSB protocol routes:
 - `POST /api/v1/bonds/:bondId/slash`
 - `GET /api/v1/parties/:addr`
 - `GET /api/v1/parties/:addr/score`
+- `GET /api/v1/parties/:addr/reputation`
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
 - `POST /api/v1/cron/dispatch-verifiers`

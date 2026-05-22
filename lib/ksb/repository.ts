@@ -25,6 +25,9 @@ import type {
   KsbVerifierRuleOutcome,
   RegisterVerifierRuleInput,
   RegisteredVerifierRule,
+  KsbReputationProfile,
+  KsbReputationSignal,
+  KsbReputationValidationRecord,
 } from './types';
 import { BUILT_IN_VERIFIER_RULES, isBuiltInVerifierRule } from './verifier-rules';
 import { executeVerifierRule, executeWebhookVerifier } from './verifier-hub';
@@ -1576,6 +1579,76 @@ export async function getKsbPartyScore(db: any, address: string): Promise<KsbPar
       standard: 'erc-8004-compatible-shape-pending',
       status: 'partial',
     },
+  };
+}
+
+const KSB_REPUTATION_SCHEMA_VERSION = '0.1';
+
+/**
+ * Build an ERC-8004 aligned reputation profile for a party.
+ *
+ * Re-shapes the party's KSB history and score into validation-registry
+ * vocabulary: each resolved bond is one validation, a release is a pass and a
+ * slash is a fail. `reputationScore` is the pass rate scaled to 0..100.
+ */
+export async function getKsbReputationProfile(db: any, address: string): Promise<KsbReputationProfile> {
+  const [history, score] = await Promise.all([
+    getKsbPartyHistory(db, address),
+    getKsbPartyScore(db, address),
+  ]);
+
+  const passed = score.score.releasedCount;
+  const failed = score.score.slashedCount;
+  const resolved = passed + failed;
+  const passRate = resolved > 0 ? passed / resolved : null;
+  const pending = Math.max(history.summary.totalBonds - resolved, 0);
+
+  const signals: KsbReputationSignal[] = score.subScores.map((sub) => ({
+    appId: sub.appId,
+    appName: sub.appName,
+    validations: sub.releasedCount + sub.slashedCount,
+    passed: sub.releasedCount,
+    failed: sub.slashedCount,
+    passRate: sub.releaseRatio,
+  }));
+
+  const recentValidations: KsbReputationValidationRecord[] = history.recentBonds.map((bond) => ({
+    bondPublicId: bond.publicId,
+    appId: bond.appId,
+    role: bond.role,
+    outcome: bond.status === 'released' ? 'released' : bond.status === 'slashed' ? 'slashed' : 'pending',
+    bondAmountSompi: bond.bondAmountSompi,
+    createdAt: bond.createdAt,
+  }));
+
+  return {
+    schema: 'erc-8004/validation-reputation',
+    schemaVersion: KSB_REPUTATION_SCHEMA_VERSION,
+    subject: {
+      account: `kaspa:${history.address}`,
+      address: history.address,
+      registry: 'ksb',
+      validationPattern: 'stake-secured-re-execution',
+    },
+    summary: {
+      totalValidations: history.summary.totalBonds,
+      passed,
+      failed,
+      pending,
+      passRate,
+      reputationScore: passRate == null ? null : Math.round(passRate * 100),
+      activeRiskIndicator: score.score.activeRiskIndicator,
+      stakeBondedSompi: history.summary.totalBondedSompi,
+      stakeSlashedSompi: history.summary.totalSlashedValueSompi,
+    },
+    signals,
+    recentValidations,
+    compatibility: {
+      standard: 'erc-8004',
+      registryRole: 'validation',
+      status: 'aligned',
+    },
+    generatedAt: new Date().toISOString(),
   };
 }
 

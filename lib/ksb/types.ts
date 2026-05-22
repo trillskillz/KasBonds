@@ -291,6 +291,62 @@ export interface KsbPartyScoreView {
   };
 }
 
+export interface KsbReputationValidationRecord {
+  bondPublicId: string;
+  appId: string;
+  role: 'provider' | 'counterparty';
+  outcome: 'released' | 'slashed' | 'pending';
+  bondAmountSompi: string;
+  createdAt: string;
+}
+
+export interface KsbReputationSignal {
+  appId: string;
+  appName: string | null;
+  validations: number;
+  passed: number;
+  failed: number;
+  passRate: number | null;
+}
+
+/**
+ * An ERC-8004 aligned reputation profile for a party.
+ *
+ * KSB is the Kaspa-native implementation of the ERC-8004 Validation Registry
+ * pattern (stake-secured re-execution). A resolved bond is one validation: a
+ * release is a pass, a slash is a fail. This profile re-shapes a party's KSB
+ * history into that validation-registry vocabulary so reputation is portable.
+ */
+export interface KsbReputationProfile {
+  schema: 'erc-8004/validation-reputation';
+  schemaVersion: string;
+  subject: {
+    account: string;
+    address: string;
+    registry: 'ksb';
+    validationPattern: 'stake-secured-re-execution';
+  };
+  summary: {
+    totalValidations: number;
+    passed: number;
+    failed: number;
+    pending: number;
+    passRate: number | null;
+    reputationScore: number | null;
+    activeRiskIndicator: number;
+    stakeBondedSompi: string;
+    stakeSlashedSompi: string;
+  };
+  signals: KsbReputationSignal[];
+  recentValidations: KsbReputationValidationRecord[];
+  compatibility: {
+    standard: 'erc-8004';
+    registryRole: 'validation';
+    status: 'aligned';
+  };
+  generatedAt: string;
+}
+
 export interface KsbCronRunResult {
   action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history' | 'dispatch-verifiers';
   scanned: number;

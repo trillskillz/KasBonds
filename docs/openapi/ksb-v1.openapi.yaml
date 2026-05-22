@@ -383,6 +383,68 @@ components:
             status: { type: string, enum: [partial] }
           required: [standard, status]
       required: [address, score, subScores, compatibility]
+    KsbReputationValidationRecord:
+      type: object
+      properties:
+        bondPublicId: { type: string }
+        appId: { type: string }
+        role: { type: string, enum: [provider, counterparty] }
+        outcome: { type: string, enum: [released, slashed, pending] }
+        bondAmountSompi: { type: string }
+        createdAt: { type: string }
+      required: [bondPublicId, appId, role, outcome, bondAmountSompi, createdAt]
+    KsbReputationSignal:
+      type: object
+      properties:
+        appId: { type: string }
+        appName: { type: [string, 'null'] }
+        validations: { type: integer }
+        passed: { type: integer }
+        failed: { type: integer }
+        passRate: { type: [number, 'null'] }
+      required: [appId, appName, validations, passed, failed, passRate]
+    KsbReputationProfile:
+      type: object
+      description: ERC-8004 aligned validation-reputation profile for a party.
+      properties:
+        schema: { type: string, enum: ['erc-8004/validation-reputation'] }
+        schemaVersion: { type: string }
+        subject:
+          type: object
+          properties:
+            account: { type: string }
+            address: { type: string }
+            registry: { type: string, enum: [ksb] }
+            validationPattern: { type: string, enum: [stake-secured-re-execution] }
+          required: [account, address, registry, validationPattern]
+        summary:
+          type: object
+          properties:
+            totalValidations: { type: integer }
+            passed: { type: integer }
+            failed: { type: integer }
+            pending: { type: integer }
+            passRate: { type: [number, 'null'] }
+            reputationScore: { type: [integer, 'null'] }
+            activeRiskIndicator: { type: number }
+            stakeBondedSompi: { type: string }
+            stakeSlashedSompi: { type: string }
+          required: [totalValidations, passed, failed, pending, passRate, reputationScore, activeRiskIndicator, stakeBondedSompi, stakeSlashedSompi]
+        signals:
+          type: array
+          items: { $ref: '#/components/schemas/KsbReputationSignal' }
+        recentValidations:
+          type: array
+          items: { $ref: '#/components/schemas/KsbReputationValidationRecord' }
+        compatibility:
+          type: object
+          properties:
+            standard: { type: string, enum: [erc-8004] }
+            registryRole: { type: string, enum: [validation] }
+            status: { type: string, enum: [aligned] }
+          required: [standard, registryRole, status]
+        generatedAt: { type: string }
+      required: [schema, schemaVersion, subject, summary, signals, recentValidations, compatibility, generatedAt]
     KsbCronRunResult:
       type: object
       properties:
@@ -731,6 +793,22 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/KsbPartyScoreView' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/parties/{addr}/reputation:
+    get:
+      summary: Get an ERC-8004 aligned reputation profile
+      parameters:
+        - $ref: '#/components/parameters/PartyAddress'
+      responses:
+        '200':
+          description: Reputation profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbReputationProfile' }
         default:
           description: Error
           content:
