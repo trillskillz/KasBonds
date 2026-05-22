@@ -35,9 +35,10 @@ Implemented now:
 - ERC-8004 aligned party reputation profiles
 - initial OpenAPI spec
 - `ksb-sdk` package published to npm
+- agent SLA reference integration
 
 Still in progress:
-- Phase 7 reputation layer
+- Phase 8 reference integrations (bug bounty, personal commitment)
 
 See also:
 - `STATUS.md`
@@ -54,6 +55,7 @@ See also:
 - `contracts/` - SilverScript bond contracts
 - `artifacts/` - compiled covenant artifacts
 - `scripts/` - TN12 and schema utility scripts
+- `references/` - standalone reference integrations built on `ksb-sdk`
 - `docs/` - operator and protocol docs
 - `vendor/` - vendored dependencies used by the proof harness
 

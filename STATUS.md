@@ -52,6 +52,7 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - started Phase 7 (reputation): added an ERC-8004 aligned reputation profile that re-shapes a party's KSB history into validation-registry vocabulary (a release is a pass, a slash is a fail), exposed at `GET /api/v1/parties/:addr/reputation`
 - extended the reputation profile with a `verifierActivity` facet (schema version 0.2): the profile now covers a party both as the subject of validations and as a performer of validations, with overall and per-app verifier counts
 - added a party reputation lookup panel to the operator console: an address lookup that renders the reputation score, summary stats, verifier activity, per-app signals, and recent validations from `GET /api/v1/parties/:addr/reputation`
+- began Phase 8 (reference integrations): added the `references/` directory and the first standalone reference app, an agent-to-agent SLA bond built on `ksb-sdk` with its own package, runnable flow, and forkable docs
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -63,4 +64,4 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Close out Phase 7 by pinning the reputation payload field names against the published ERC-8004 schema, then begin Phase 8 reference integrations.
+Continue Phase 8: add the bug bounty and personal commitment reference integrations alongside the agent SLA reference.
