@@ -345,10 +345,14 @@ Returns:
   `reputationScore` from 0 to 100, active risk indicator, and stake totals
 - `signals` per-app validation breakdown
 - `recentValidations` recent resolved or pending bonds as validation records
+- `verifierActivity` the party acting as a verifier: validations served and
+  bond value observed, overall and per app
 - `compatibility` the ERC-8004 standard and validation registry role
 - `generatedAt` timestamp
 
 Notes:
+- `summary` and `signals` describe the party as the subject of validations;
+  `verifierActivity` describes the party as a performer of validations
 - `reputationScore` is the pass rate scaled to 0..100, null when nothing has resolved
 - the payload is aligned with the ERC-8004 Validation Registry pattern and is versioned so the exact field shape can be pinned to the published schema
 

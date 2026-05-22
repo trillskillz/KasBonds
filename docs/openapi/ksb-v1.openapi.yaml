@@ -403,6 +403,24 @@ components:
         failed: { type: integer }
         passRate: { type: [number, 'null'] }
       required: [appId, appName, validations, passed, failed, passRate]
+    KsbReputationVerifierAppActivity:
+      type: object
+      properties:
+        appId: { type: string }
+        appName: { type: [string, 'null'] }
+        validationsServed: { type: integer }
+        bondedValueObservedSompi: { type: string }
+      required: [appId, appName, validationsServed, bondedValueObservedSompi]
+    KsbReputationVerifierActivity:
+      type: object
+      properties:
+        validationsServed: { type: integer }
+        appsServed: { type: integer }
+        bondedValueObservedSompi: { type: string }
+        perApp:
+          type: array
+          items: { $ref: '#/components/schemas/KsbReputationVerifierAppActivity' }
+      required: [validationsServed, appsServed, bondedValueObservedSompi, perApp]
     KsbReputationProfile:
       type: object
       description: ERC-8004 aligned validation-reputation profile for a party.
@@ -436,6 +454,7 @@ components:
         recentValidations:
           type: array
           items: { $ref: '#/components/schemas/KsbReputationValidationRecord' }
+        verifierActivity: { $ref: '#/components/schemas/KsbReputationVerifierActivity' }
         compatibility:
           type: object
           properties:
@@ -444,7 +463,7 @@ components:
             status: { type: string, enum: [aligned] }
           required: [standard, registryRole, status]
         generatedAt: { type: string }
-      required: [schema, schemaVersion, subject, summary, signals, recentValidations, compatibility, generatedAt]
+      required: [schema, schemaVersion, subject, summary, signals, recentValidations, verifierActivity, compatibility, generatedAt]
     KsbCronRunResult:
       type: object
       properties:

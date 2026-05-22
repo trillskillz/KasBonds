@@ -1582,7 +1582,7 @@ export async function getKsbPartyScore(db: any, address: string): Promise<KsbPar
   };
 }
 
-const KSB_REPUTATION_SCHEMA_VERSION = '0.1';
+const KSB_REPUTATION_SCHEMA_VERSION = '0.2';
 
 /**
  * Build an ERC-8004 aligned reputation profile for a party.
@@ -1621,6 +1621,30 @@ export async function getKsbReputationProfile(db: any, address: string): Promise
     createdAt: bond.createdAt,
   }));
 
+  // The party as a verifier: validation work performed, drawn from the
+  // verifier-role rows in ksb_party_history.
+  const verifierPerApp = history.apps
+    .map((app) => {
+      const verifierRoles = app.roles.filter((role) => role.role === 'verifier');
+      const validationsServed = verifierRoles.reduce((sum, role) => sum + role.bondsReleased + role.bondsSlashed, 0);
+      const bondedValueObservedSompi = verifierRoles.reduce(
+        (sum, role) => addSompiStrings(sum, role.totalBondedSompi),
+        '0',
+      );
+      return { appId: app.appId, appName: app.appName, validationsServed, bondedValueObservedSompi };
+    })
+    .filter((entry) => entry.validationsServed > 0 || entry.bondedValueObservedSompi !== '0');
+
+  const verifierActivity = {
+    validationsServed: verifierPerApp.reduce((sum, entry) => sum + entry.validationsServed, 0),
+    appsServed: verifierPerApp.length,
+    bondedValueObservedSompi: verifierPerApp.reduce(
+      (sum, entry) => addSompiStrings(sum, entry.bondedValueObservedSompi),
+      '0',
+    ),
+    perApp: verifierPerApp,
+  };
+
   return {
     schema: 'erc-8004/validation-reputation',
     schemaVersion: KSB_REPUTATION_SCHEMA_VERSION,
@@ -1643,6 +1667,7 @@ export async function getKsbReputationProfile(db: any, address: string): Promise
     },
     signals,
     recentValidations,
+    verifierActivity,
     compatibility: {
       standard: 'erc-8004',
       registryRole: 'validation',

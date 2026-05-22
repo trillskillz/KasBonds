@@ -309,6 +309,24 @@ export interface KsbReputationSignal {
   passRate: number | null;
 }
 
+export interface KsbReputationVerifierAppActivity {
+  appId: string;
+  appName: string | null;
+  validationsServed: number;
+  bondedValueObservedSompi: string;
+}
+
+/**
+ * The party acting as a verifier: how much validation work this address has
+ * performed, as opposed to being the subject of validations.
+ */
+export interface KsbReputationVerifierActivity {
+  validationsServed: number;
+  appsServed: number;
+  bondedValueObservedSompi: string;
+  perApp: KsbReputationVerifierAppActivity[];
+}
+
 /**
  * An ERC-8004 aligned reputation profile for a party.
  *
@@ -339,6 +357,7 @@ export interface KsbReputationProfile {
   };
   signals: KsbReputationSignal[];
   recentValidations: KsbReputationValidationRecord[];
+  verifierActivity: KsbReputationVerifierActivity;
   compatibility: {
     standard: 'erc-8004';
     registryRole: 'validation';
