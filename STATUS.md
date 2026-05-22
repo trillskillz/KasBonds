@@ -43,6 +43,7 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - expanded the operator console with create-draft, accept, and lock actions so the app can drive bonds from draft through active before resolution
 - added a first verifier queue view with counts, review-focused bond buckets, and clearer execution handoff cues for approved versus rejected bonds
 - added the built-in verifier rule catalog covering http, content, time, signature, and oracle checks, and merged it into the verifier-rule listing endpoint
+- added launch-grade SDK examples for the agent SLA and bug bounty use cases, plus a typecheck path that compiles every example against the SDK source
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant

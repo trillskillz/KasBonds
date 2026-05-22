@@ -123,6 +123,12 @@ Protocol artifacts:
 SDK helpers:
 - `npm run sdk:typecheck`
 - `npm run sdk:build`
+- `npm run sdk:examples:typecheck`
+
+SDK examples live in `sdk/examples/`:
+- `quickstart.ts` - operator app bootstrap, bond creation, status read
+- `agent-sla.ts` - agent-to-agent SLA bond verified by `http_status_check`
+- `bug-bounty.ts` - bug bounty escrow with signature and content checks, including the contest path
 
 ## Notes
 

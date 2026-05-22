@@ -9,7 +9,7 @@ This pass provides:
 - a small `KsbClient` wrapper around the current `/api/v1` HTTP surface
 - app-authenticated and operator-authenticated request helpers
 - a local TypeScript build layout
-- a quickstart example under `examples/quickstart.ts`
+- launch-grade examples under `examples/`
 
 It is still intentionally thin. The goal is to stabilize the protocol surface before polishing ergonomics.
 
@@ -39,12 +39,18 @@ const bond = await client.createBond({
   bondAmountSompi: '1000000000',
   deadlineUnix: Math.floor(Date.now() / 1000) + 3600,
   verifierConfigJson: {
-    verifierAddress: 'kaspa:verifier...',
-    rules: [{ name: 'http-check', verifierAddress: 'kaspa:verifier...' }],
+    rules: [
+      {
+        name: 'http_status_check',
+        verifierType: 'http',
+        params: { url: 'https://api.example.com/health', expectedStatus: 200 },
+      },
+    ],
   },
   slashDistributionJson: {
-    provider: 0.7,
-    counterparty: 0.295,
+    counterparty_compensation: 0.5,
+    burn: 0.45,
+    verifier_fee: 0.045,
     protocol_fee: 0.005,
   },
 });
@@ -53,7 +59,21 @@ const status = await client.getBondStatus(bond.bond.publicId);
 console.log(status.status);
 ```
 
-For a fuller flow including operator-side app bootstrap, see `examples/quickstart.ts`.
+## Examples
+
+The `examples/` directory holds runnable end-to-end flows:
+- `quickstart.ts` - operator app bootstrap, bond creation, status read
+- `agent-sla.ts` - agent-to-agent SLA bond verified by `http_status_check`
+- `bug-bounty.ts` - bug bounty escrow with `signature_check` plus `http_content_check`, including the contest path
+
+Built-in rule names referenced by the examples come from the protocol catalog
+returned by `GET /api/v1/verifier-rules`.
+
+Typecheck every example against the SDK source:
+
+```bash
+npm run examples:typecheck
+```
 
 ## Next SDK work
 
@@ -61,4 +81,4 @@ For a fuller flow including operator-side app bootstrap, see `examples/quickstar
 - publishing workflow
 - richer auth helpers
 - signing helpers for release/slash execution payloads
-- more launch-grade examples
+- a personal commitment reference example
