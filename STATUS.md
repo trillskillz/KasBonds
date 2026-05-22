@@ -1,7 +1,7 @@
 # KSB Status
 
 ## Current phase
-Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB schema, the versioned `/api/v1` protocol surface, the verifier hub with composable rule sets and custom verifier registration, the cron resolvers, and a publish-ready SDK. Phase 7 (reputation) is now underway.
+Phases 1 through 8 are in place: the TN12 covenant proof, the canonical KSB schema, the versioned `/api/v1` protocol surface, the verifier hub with composable rule sets and custom verifier registration, the cron resolvers, the published `ksb-sdk`, the ERC-8004 aligned reputation layer, and three reference integrations. Phase 9 verification tooling is built and awaits a live testnet 12 run; Phase 10 is prepared as a gated launch runbook.
 
 ## What has been started
 - reset the project plan around the KSB infrastructure framing
@@ -55,6 +55,7 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - began Phase 8 (reference integrations): added the `references/` directory and the first standalone reference app, an agent-to-agent SLA bond built on `ksb-sdk` with its own package, runnable flow, and forkable docs
 - completed the Phase 8 reference set: added the bug bounty escrow reference (composed AND/OR rule set plus a dispute path) and the personal commitment reference (a `deadline_time_check` bond showing the verifier-hub runtime-input pattern), each a standalone `ksb-sdk` project with forkable docs
 - began Phase 9 (testnet end-to-end): added the `e2e/` verification harness that drives the protocol surface through 12 lifecycle cases against a running instance, and created `TESTNET_VERIFICATION.md` tracking all Phase 9 cases and on-chain transaction evidence
+- prepared Phase 10 (mainnet launch): added `MAINNET_LAUNCH.md`, a gated launch runbook covering audit completion, mainnet deployment with 1 KAS release and slash tests, public launch, and ecosystem outreach, with the hard gates stated up front
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -66,4 +67,4 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Run the `e2e/` harness against a live testnet 12 KSB deployment, complete the on-chain release and slash steps, and fill in `TESTNET_VERIFICATION.md` with the results.
+Clear the Phase 10 hard gates in order: finish the external audit, complete Phase 9 verification on testnet 12, and confirm Toccata mainnet activation. Mainnet launch follows `MAINNET_LAUNCH.md` only after all three.

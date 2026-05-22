@@ -45,6 +45,7 @@ See also:
 - `PLAN.md`
 - `GAP_ANALYSIS.md`
 - `TESTNET_VERIFICATION.md`
+- `MAINNET_LAUNCH.md`
 - `docs/KSB_API_V1.md`
 
 ## Repo layout
