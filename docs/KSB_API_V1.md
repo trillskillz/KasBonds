@@ -231,7 +231,8 @@ Notes:
 - verifier role totals come from `ksb_party_history`
 - recent bond activity is derived from canonical `ksb_bonds`
 - provider and counterparty bonded totals are now maintained at bond creation time
-- verifier participation is heuristically inferred from known verifier/oracle address fields in `verifierConfigJson`
+- verifier participation is now inferred only from explicit known verifier/oracle fields in `verifierConfigJson`
+- supported verifier attribution fields currently include top-level and rule-level forms such as `verifierAddress`, `verifierAddresses`, `oracleAddress`, `oracleAddresses`, `verifiers`, and `oracles`
 
 ### `GET /api/v1/parties/:addr/score`
 Reads a public reputation-style score view for an address.

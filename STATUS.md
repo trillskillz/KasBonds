@@ -53,4 +53,4 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Decide whether app registration should be gated separately, then keep tightening verifier-role attribution semantics.
+Decide whether app registration should be gated separately, with verifier-role attribution now narrowed to explicit known config fields.

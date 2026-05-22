@@ -79,38 +79,61 @@ function parseJsonObject(value: string | null | undefined, fieldName: string) {
   return parsed as Record<string, unknown>;
 }
 
-function collectVerifierAddresses(value: unknown, acc = new Set<string>()) {
+function addKnownAddresses(value: unknown, acc: Set<string>) {
+  if (typeof value === 'string' && value.trim()) {
+    acc.add(value.trim());
+    return;
+  }
+
   if (Array.isArray(value)) {
     for (const entry of value) {
-      collectVerifierAddresses(entry, acc);
-    }
-    return acc;
-  }
-
-  if (!value || typeof value !== 'object') {
-    return acc;
-  }
-
-  const record = value as Record<string, unknown>;
-  const addressKeys = new Set(['verifierAddress', 'verifierAddresses', 'oracleAddress', 'oracleAddresses']);
-
-  for (const [key, entry] of Object.entries(record)) {
-    if (addressKeys.has(key)) {
       if (typeof entry === 'string' && entry.trim()) {
         acc.add(entry.trim());
-      } else if (Array.isArray(entry)) {
-        for (const item of entry) {
-          if (typeof item === 'string' && item.trim()) {
-            acc.add(item.trim());
-          }
-        }
+      } else if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+        const record = entry as Record<string, unknown>;
+        addKnownAddresses(record.address, acc);
+        addKnownAddresses(record.verifierAddress, acc);
+        addKnownAddresses(record.oracleAddress, acc);
       }
     }
+  }
+}
 
-    collectVerifierAddresses(entry, acc);
+function extractVerifierAddresses(verifierConfigJson: string) {
+  const parsed = parseJsonObject(verifierConfigJson, 'verifierConfigJson');
+  const acc = new Set<string>();
+
+  addKnownAddresses(parsed.verifierAddress, acc);
+  addKnownAddresses(parsed.verifierAddresses, acc);
+  addKnownAddresses(parsed.oracleAddress, acc);
+  addKnownAddresses(parsed.oracleAddresses, acc);
+  addKnownAddresses(parsed.verifiers, acc);
+  addKnownAddresses(parsed.oracles, acc);
+
+  const ruleCollections = [parsed.rules, parsed.verifications, parsed.ruleSet];
+  for (const collection of ruleCollections) {
+    if (!Array.isArray(collection)) {
+      continue;
+    }
+
+    for (const entry of collection) {
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+        continue;
+      }
+
+      const record = entry as Record<string, unknown>;
+      addKnownAddresses(record.verifierAddress, acc);
+      addKnownAddresses(record.verifierAddresses, acc);
+      addKnownAddresses(record.oracleAddress, acc);
+      addKnownAddresses(record.oracleAddresses, acc);
+      addKnownAddresses(record.verifier, acc);
+      addKnownAddresses(record.oracle, acc);
+      addKnownAddresses(record.verifiers, acc);
+      addKnownAddresses(record.oracles, acc);
+    }
   }
 
-  return acc;
+  return Array.from(acc);
 }
 
 function normalizeRuleSetFromVerifierConfig(verifierConfigJson: string) {
@@ -422,8 +445,7 @@ async function upsertKsbPartyBondedAmount(
   db: any,
   bond: Pick<KsbBondRecord, 'appId' | 'providerAddress' | 'counterpartyAddress' | 'bondAmountSompi' | 'verifierConfigJson'>,
 ) {
-  const parsedVerifierConfig = parseJsonObject(bond.verifierConfigJson, 'verifierConfigJson');
-  const verifierAddresses = Array.from(collectVerifierAddresses(parsedVerifierConfig));
+  const verifierAddresses = extractVerifierAddresses(bond.verifierConfigJson);
   const participants = [
     { address: bond.providerAddress, role: 'provider' as const },
     { address: bond.counterpartyAddress, role: 'counterparty' as const },
