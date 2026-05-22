@@ -1,5 +1,5 @@
 import { getDb } from '../../../../../../lib/db/client';
-import { ksbJson, requireKsbOperator } from '../../../../../../lib/ksb/protocol';
+import { ksbJson, requireKsbOperator, requireVerifiedKsbExecution } from '../../../../../../lib/ksb/protocol';
 import { recordKsbSlashExecution } from '../../../../../../lib/ksb/repository';
 import type { RecordKsbSlashExecutionInput } from '../../../../../../lib/ksb/types';
 
@@ -17,6 +17,16 @@ export async function POST(
 
     const { bondId } = await context.params;
     const body = (await request.json()) as RecordKsbSlashExecutionInput;
+    const executionAuth = requireVerifiedKsbExecution(
+      typeof body.executionPayloadJson === 'string' ? body.executionPayloadJson : JSON.stringify(body.executionPayloadJson),
+      body.executionSignature,
+      body.executionSigner,
+      body.executionSignedAt,
+    );
+    if (!executionAuth.ok) {
+      return executionAuth.response;
+    }
+
     const db = getDb();
     const detail = await recordKsbSlashExecution(db, bondId, body);
 

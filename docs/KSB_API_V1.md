@@ -44,6 +44,11 @@ Operator auth currently requires:
 
 If `KSB_OPERATOR_API_KEY` is unset, those routes return `503` rather than staying silently open.
 
+Execution-signature verification currently requires:
+- `KSB_OPERATOR_SIGNING_PUBLIC_KEY`
+- optional `KSB_OPERATOR_SIGNER_ID` to pin the expected signer identity
+- optional `KSB_EXECUTION_SIGNATURE_MAX_AGE_SECONDS` (defaults to `900`)
+
 ## Route details
 
 ### `POST /api/v1/apps/register`
@@ -177,6 +182,7 @@ Behavior:
 - stamps `resolved_at`
 - updates party release counters on first terminal transition
 - requires a signed execution payload whose `action`, bond id, and `resolutionTxHash` match the request
+- cryptographically verifies `executionSignature` against `executionPayloadJson`
 
 ### `POST /api/v1/bonds/:bondId/slash`
 Records canonical slash execution after a failed, timed out, or disputed outcome.
@@ -210,6 +216,7 @@ Behavior:
 - stamps `resolved_at`
 - updates party slash counters on first terminal transition
 - requires a signed execution payload whose `action`, bond id, `reason`, `slashAmountSompi`, and `resolutionTxHash` match the request
+- cryptographically verifies `executionSignature` against `executionPayloadJson`
 
 ### `GET /api/v1/parties/:addr`
 Reads public participation history for an address.
@@ -314,5 +321,5 @@ This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
 ## Next recommended slice
 
-1. verify execution signatures cryptographically instead of only enforcing signed-payload shape
+1. decide whether app registration should also be gated or bootstrapped separately
 2. stronger verifier-role attribution semantics beyond heuristic config parsing
