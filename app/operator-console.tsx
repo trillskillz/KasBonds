@@ -614,7 +614,7 @@ export default function OperatorConsole() {
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap', marginBottom: 28 }}>
         <div>
           <div style={{ display: 'inline-flex', padding: '6px 12px', border: '1px solid rgba(255,77,77,0.4)', borderRadius: 999, color: '#ff4d4d', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
-            BondClaw operator console
+            KSB operator console
           </div>
           <h1 style={{ fontSize: 42, lineHeight: 1.05, margin: '0 0 12px 0' }}>Run the bond lifecycle from the app.</h1>
           <p style={{ margin: 0, maxWidth: 760, color: 'rgba(245,247,251,0.78)', lineHeight: 1.7, fontSize: 16 }}>
