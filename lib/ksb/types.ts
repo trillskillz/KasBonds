@@ -77,6 +77,10 @@ export interface ContestKsbBondInput {
 
 export interface RecordKsbReleaseExecutionInput {
   resolutionTxHash: string;
+  executionPayloadJson: string | Record<string, unknown>;
+  executionSignature: string;
+  executionSigner: string;
+  executionSignedAt: string;
   actorId?: string | null;
   summary?: string | null;
 }
@@ -86,6 +90,10 @@ export interface RecordKsbSlashExecutionInput {
   reason: string;
   slashAmountSompi: string;
   distributionJson: string | Record<string, unknown>;
+  executionPayloadJson: string | Record<string, unknown>;
+  executionSignature: string;
+  executionSigner: string;
+  executionSignedAt: string;
   actorId?: string | null;
   summary?: string | null;
 }

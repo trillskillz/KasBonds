@@ -174,6 +174,68 @@ function assertSompiString(value: string | null | undefined, fieldName: string, 
   return value;
 }
 
+function normalizeIsoTimestamp(value: string | null | undefined, fieldName: string) {
+  const normalized = value?.trim();
+  if (!normalized) {
+    throw new Error(`${fieldName} is required`);
+  }
+
+  const millis = Date.parse(normalized);
+  if (!Number.isFinite(millis)) {
+    throw new Error(`${fieldName} must be a valid ISO timestamp`);
+  }
+
+  return new Date(millis).toISOString();
+}
+
+function normalizeExecutionSignature(value: string | null | undefined, fieldName: string) {
+  const normalized = value?.trim();
+  if (!normalized) {
+    throw new Error(`${fieldName} is required`);
+  }
+  if (normalized.length < 16) {
+    throw new Error(`${fieldName} must look like a real signature`);
+  }
+  return normalized;
+}
+
+function validateExecutionPayload(
+  payloadJson: string,
+  expected: {
+    action: 'release' | 'slash';
+    bondId: string;
+    publicId: string;
+    resolutionTxHash: string;
+    slashAmountSompi?: string | null;
+    reason?: string | null;
+  },
+) {
+  const payload = parseJsonObject(payloadJson, 'executionPayloadJson');
+
+  if (payload.action !== expected.action) {
+    throw new Error(`executionPayloadJson.action must be ${expected.action}`);
+  }
+  if (payload.bondId !== expected.bondId && payload.bondId !== expected.publicId) {
+    throw new Error('executionPayloadJson.bondId must match the target bond');
+  }
+  if (payload.publicId != null && payload.publicId !== expected.publicId) {
+    throw new Error('executionPayloadJson.publicId must match the target bond');
+  }
+  if (payload.resolutionTxHash !== expected.resolutionTxHash) {
+    throw new Error('executionPayloadJson.resolutionTxHash must match resolutionTxHash');
+  }
+  if (expected.action === 'slash') {
+    if (payload.reason !== expected.reason) {
+      throw new Error('executionPayloadJson.reason must match reason');
+    }
+    if (payload.slashAmountSompi !== expected.slashAmountSompi) {
+      throw new Error('executionPayloadJson.slashAmountSompi must match slashAmountSompi');
+    }
+  }
+
+  return payload;
+}
+
 function rowToRegisteredApp(row: any): RegisteredAppRecord {
   return {
     appId: String(row.app_id),
@@ -882,10 +944,25 @@ export async function recordKsbReleaseExecution(
     throw new Error('resolutionTxHash is required');
   }
 
+  const executionPayloadJson = normalizeJsonInput(input.executionPayloadJson, 'executionPayloadJson', true)!;
+  const executionSignature = normalizeExecutionSignature(input.executionSignature, 'executionSignature');
+  const executionSigner = input.executionSigner?.trim();
+  if (!executionSigner) {
+    throw new Error('executionSigner is required');
+  }
+  const executionSignedAt = normalizeIsoTimestamp(input.executionSignedAt, 'executionSignedAt');
+
   const current = await getKsbBondDetail(db, idOrPublicId);
   if (!['verified', 'released'].includes(current.bond.status)) {
     throw new Error(`Release cannot be recorded from status ${current.bond.status}`);
   }
+
+  validateExecutionPayload(executionPayloadJson, {
+    action: 'release',
+    bondId: current.bond.id,
+    publicId: current.bond.publicId,
+    resolutionTxHash: txHash,
+  });
 
   const isFirstResolution = current.bond.status !== 'released';
 
@@ -907,7 +984,7 @@ export async function recordKsbReleaseExecution(
       'operator',
       input.actorId?.trim() || null,
       input.summary?.trim() || 'Release execution recorded',
-      JSON.stringify({ resolutionTxHash: txHash }),
+      JSON.stringify({ resolutionTxHash: txHash, executionPayloadJson: JSON.parse(executionPayloadJson), executionSignature, executionSigner, executionSignedAt }),
     );
   }
 
@@ -930,10 +1007,26 @@ export async function recordKsbSlashExecution(
 
   const slashAmountSompi = assertSompiString(input.slashAmountSompi, 'slashAmountSompi');
   const distributionJson = normalizeJsonInput(input.distributionJson, 'distributionJson', true)!;
+  const executionPayloadJson = normalizeJsonInput(input.executionPayloadJson, 'executionPayloadJson', true)!;
+  const executionSignature = normalizeExecutionSignature(input.executionSignature, 'executionSignature');
+  const executionSigner = input.executionSigner?.trim();
+  if (!executionSigner) {
+    throw new Error('executionSigner is required');
+  }
+  const executionSignedAt = normalizeIsoTimestamp(input.executionSignedAt, 'executionSignedAt');
   const current = await getKsbBondDetail(db, idOrPublicId);
   if (!['failed', 'timed_out', 'contested', 'arbitration', 'slashed'].includes(current.bond.status)) {
     throw new Error(`Slash cannot be recorded from status ${current.bond.status}`);
   }
+
+  validateExecutionPayload(executionPayloadJson, {
+    action: 'slash',
+    bondId: current.bond.id,
+    publicId: current.bond.publicId,
+    resolutionTxHash: txHash,
+    slashAmountSompi,
+    reason,
+  });
 
   const isFirstResolution = current.bond.status !== 'slashed';
 
@@ -978,7 +1071,7 @@ export async function recordKsbSlashExecution(
       'operator',
       input.actorId?.trim() || null,
       input.summary?.trim() || 'Slash execution recorded',
-      JSON.stringify({ resolutionTxHash: txHash, reason, slashAmountSompi }),
+      JSON.stringify({ resolutionTxHash: txHash, reason, slashAmountSompi, executionPayloadJson: JSON.parse(executionPayloadJson), executionSignature, executionSigner, executionSignedAt }),
     );
   }
 

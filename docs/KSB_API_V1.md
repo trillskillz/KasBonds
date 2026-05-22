@@ -164,6 +164,10 @@ Allowed from:
 
 Request body:
 - `resolutionTxHash`
+- `executionPayloadJson`
+- `executionSignature`
+- `executionSigner`
+- `executionSignedAt`
 - optional `actorId`
 - optional `summary`
 
@@ -172,6 +176,7 @@ Behavior:
 - moves status to `released`
 - stamps `resolved_at`
 - updates party release counters on first terminal transition
+- requires a signed execution payload whose `action`, bond id, and `resolutionTxHash` match the request
 
 ### `POST /api/v1/bonds/:bondId/slash`
 Records canonical slash execution after a failed, timed out, or disputed outcome.
@@ -191,6 +196,10 @@ Request body:
 - `reason`
 - `slashAmountSompi`
 - `distributionJson`
+- `executionPayloadJson`
+- `executionSignature`
+- `executionSigner`
+- `executionSignedAt`
 - optional `actorId`
 - optional `summary`
 
@@ -200,6 +209,7 @@ Behavior:
 - upserts `ksb_slashing_events`
 - stamps `resolved_at`
 - updates party slash counters on first terminal transition
+- requires a signed execution payload whose `action`, bond id, `reason`, `slashAmountSompi`, and `resolutionTxHash` match the request
 
 ### `GET /api/v1/parties/:addr`
 Reads public participation history for an address.
@@ -304,5 +314,5 @@ This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
 ## Next recommended slice
 
-1. add signature-backed execution payload expectations for release/slash routes
+1. verify execution signatures cryptographically instead of only enforcing signed-payload shape
 2. stronger verifier-role attribution semantics beyond heuristic config parsing
