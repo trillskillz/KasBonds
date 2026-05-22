@@ -19,8 +19,13 @@ import type {
   RegisteredAppSecret,
   ContestKsbBondInput,
   SubmitKsbBondProofInput,
+  KsbBondStatus,
+  DispatchKsbVerificationInput,
+  KsbDispatchResult,
+  KsbVerifierRuleOutcome,
 } from './types';
 import { BUILT_IN_VERIFIER_RULES, isBuiltInVerifierRule } from './verifier-rules';
+import { executeVerifierRule } from './verifier-hub';
 
 function makeAppId() {
   return `app_${randomUUID().replace(/-/g, '').slice(0, 16)}`;
@@ -727,6 +732,236 @@ export async function listKsbVerifierRules(db: any): Promise<KsbVerifierRuleReco
     .filter((rule: KsbVerifierRuleRecord) => !isBuiltInVerifierRule(rule.name));
 
   return [...BUILT_IN_VERIFIER_RULES, ...customRules].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function aggregateBondStatus(results: string[]): KsbBondStatus {
+  if (results.includes('contested')) return 'contested';
+  if (results.includes('failed')) return 'failed';
+  if (results.includes('timed_out')) return 'timed_out';
+  if (results.length > 0 && results.every((result) => result === 'passed')) return 'verified';
+  return 'active';
+}
+
+interface VerifierRuleSpec {
+  ruleName: string;
+  verifierType: string;
+  description: string;
+  schemaJson: string;
+  params: Record<string, unknown>;
+}
+
+function parseVerifierRuleSpecs(verifierConfigJson: string): VerifierRuleSpec[] {
+  const parsed = parseJsonObject(verifierConfigJson, 'verifierConfigJson');
+  const rawRules = Array.isArray(parsed.rules)
+    ? parsed.rules
+    : Array.isArray(parsed.verifications)
+      ? parsed.verifications
+      : [];
+
+  const specs: VerifierRuleSpec[] = [];
+  for (const entry of rawRules) {
+    if (typeof entry === 'string') {
+      const builtIn = BUILT_IN_VERIFIER_RULES.find((rule) => rule.name === entry);
+      specs.push({
+        ruleName: entry,
+        verifierType: builtIn?.verifierType ?? 'custom',
+        description: builtIn?.description ?? 'Rule declared in verifierConfigJson',
+        schemaJson: builtIn?.schemaJson ?? '{}',
+        params: {},
+      });
+      continue;
+    }
+
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      continue;
+    }
+
+    const record = entry as Record<string, unknown>;
+    const ruleName = typeof record.name === 'string'
+      ? record.name
+      : typeof record.ruleName === 'string'
+        ? record.ruleName
+        : null;
+    if (!ruleName) {
+      continue;
+    }
+
+    const builtIn = BUILT_IN_VERIFIER_RULES.find((rule) => rule.name === ruleName);
+    const verifierType = typeof record.verifierType === 'string' ? record.verifierType : builtIn?.verifierType ?? 'custom';
+    const description = typeof record.description === 'string'
+      ? record.description
+      : builtIn?.description ?? 'Rule declared in verifierConfigJson';
+    const schemaJson = builtIn?.schemaJson
+      ?? (record.schema && typeof record.schema === 'object' && !Array.isArray(record.schema) ? JSON.stringify(record.schema) : '{}');
+    const params = record.params && typeof record.params === 'object' && !Array.isArray(record.params)
+      ? (record.params as Record<string, unknown>)
+      : {};
+
+    specs.push({ ruleName, verifierType, description, schemaJson, params });
+  }
+
+  return specs;
+}
+
+/**
+ * Verifier hub dispatch for a single bond.
+ *
+ * Runs every rule declared in the bond `verifierConfigJson` through the
+ * verifier hub, persists the protocol-computed result for each rule, and
+ * recomputes the bond status. Runtime inputs supplied by the caller are
+ * merged over the static params declared in the config.
+ */
+export async function dispatchKsbBondVerifications(
+  db: any,
+  idOrPublicId: string,
+  input: DispatchKsbVerificationInput = {},
+): Promise<KsbDispatchResult> {
+  const detail = await getKsbBondDetail(db, idOrPublicId);
+  const bond = detail.bond;
+
+  const dispatchable: KsbBondStatus[] = ['proposed', 'committed', 'active', 'verified', 'failed', 'timed_out'];
+  if (!dispatchable.includes(bond.status)) {
+    throw new Error(`Verifier dispatch is not allowed from status ${bond.status}`);
+  }
+
+  const specs = parseVerifierRuleSpecs(bond.verifierConfigJson);
+  if (specs.length === 0) {
+    throw new Error('verifierConfigJson declares no verifier rules to dispatch');
+  }
+
+  const inputMap = new Map<string, Record<string, unknown>>();
+  for (const entry of input.inputs ?? []) {
+    const name = entry.ruleName?.trim();
+    if (name) {
+      inputMap.set(name, entry.params && typeof entry.params === 'object' && !Array.isArray(entry.params) ? entry.params : {});
+    }
+  }
+
+  const ctx = { deadlineUnix: bond.deadlineUnix };
+  const outcomes: KsbVerifierRuleOutcome[] = [];
+
+  for (const spec of specs) {
+    await ensureVerifierRule(db, {
+      ruleName: spec.ruleName,
+      verifierType: spec.verifierType,
+      description: spec.description,
+      schemaJson: spec.schemaJson,
+    });
+
+    const params = { ...spec.params, ...(inputMap.get(spec.ruleName) ?? {}) };
+    const startedAt = Date.now();
+    const execution = await executeVerifierRule(spec.ruleName, params, ctx);
+    const durationMs = Date.now() - startedAt;
+    const evidenceJson = JSON.stringify({
+      ...execution.evidence,
+      dispatchedAt: new Date().toISOString(),
+      durationMs,
+    });
+
+    outcomes.push({
+      ruleName: spec.ruleName,
+      verifierType: spec.verifierType,
+      result: execution.result,
+      evidenceJson,
+      durationMs,
+    });
+
+    const existing = detail.verifications.find((verification) => verification.ruleName === spec.ruleName) ?? null;
+    if (existing) {
+      await (db as any).$client.execute({
+        sql: `
+          UPDATE ksb_verifications
+          SET result = :result, evidence_json = :evidenceJson, verifier_signature = 'ksb-hub', verified_at = CURRENT_TIMESTAMP
+          WHERE id = :id
+        `,
+        args: { id: existing.id, result: execution.result, evidenceJson },
+      });
+      continue;
+    }
+
+    await (db as any).$client.execute({
+      sql: `
+        INSERT INTO ksb_verifications (
+          id, bond_id, rule_name, result, evidence_json, verifier_signature
+        ) VALUES (
+          :id, :bondId, :ruleName, :result, :evidenceJson, 'ksb-hub'
+        )
+      `,
+      args: { id: randomUUID(), bondId: bond.id, ruleName: spec.ruleName, result: execution.result, evidenceJson },
+    });
+  }
+
+  const refreshed = await getKsbBondDetail(db, bond.id);
+  const statusAfter = aggregateBondStatus(refreshed.verifications.map((verification) => verification.result));
+
+  if (statusAfter !== bond.status) {
+    await (db as any).$client.execute({
+      sql: `UPDATE ksb_bonds SET status = :status WHERE id = :bondId`,
+      args: { status: statusAfter, bondId: bond.id },
+    });
+  }
+
+  await addKsbBondEvent(
+    db,
+    bond.id,
+    'verifiers_dispatched',
+    input.actorId ? 'operator' : 'system',
+    input.actorId?.trim() || null,
+    input.summary?.trim() || 'Verifier hub dispatched configured rules',
+    JSON.stringify({
+      from: bond.status,
+      to: statusAfter,
+      outcomes: outcomes.map((outcome) => ({ ruleName: outcome.ruleName, result: outcome.result, durationMs: outcome.durationMs })),
+    }),
+  );
+
+  return {
+    bond: await getKsbBondDetail(db, bond.id),
+    statusBefore: bond.status,
+    statusAfter,
+    outcomes,
+  };
+}
+
+/**
+ * Cron entry point: dispatch verifier rules for every in-progress bond.
+ *
+ * Bonds whose rules need runtime inputs that are not embedded in the config
+ * stay in their current status until those inputs arrive. Bonds with no
+ * dispatchable rules are skipped.
+ */
+export async function dispatchPendingKsbVerifications(db: any): Promise<KsbCronRunResult> {
+  const bondsResult = await (db as any).$client.execute({
+    sql: `
+      SELECT id, public_id
+      FROM ksb_bonds
+      WHERE status IN ('committed', 'active')
+      ORDER BY updated_at ASC
+      LIMIT 100
+    `,
+    args: {},
+  });
+
+  const bondIds: string[] = [];
+  for (const row of bondsResult.rows) {
+    try {
+      const result = await dispatchKsbBondVerifications(db, String(row.id), { summary: 'Scheduled verifier dispatch' });
+      if (result.statusAfter !== result.statusBefore) {
+        bondIds.push(String(row.public_id));
+      }
+    } catch {
+      // Bonds with no dispatchable rules or a transient failure are skipped;
+      // the cron stays idempotent and retries them on the next run.
+    }
+  }
+
+  return {
+    action: 'dispatch-verifiers',
+    scanned: bondsResult.rows.length,
+    updated: bondIds.length,
+    bondIds,
+    at: new Date().toISOString(),
+  };
 }
 
 export async function getKsbBondDetail(db: any, idOrPublicId: string): Promise<KsbBondDetail> {

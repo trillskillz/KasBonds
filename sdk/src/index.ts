@@ -270,11 +270,37 @@ export interface KsbVerifierRuleRecord {
 }
 
 export interface KsbCronRunResult {
-  action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history';
+  action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history' | 'dispatch-verifiers';
   scanned: number;
   updated: number;
   bondIds: string[];
   at: string;
+}
+
+export interface DispatchVerifierRuleInput {
+  ruleName: string;
+  params?: Record<string, JsonValue>;
+}
+
+export interface DispatchKsbVerificationInput {
+  inputs?: DispatchVerifierRuleInput[];
+  actorId?: string | null;
+  summary?: string | null;
+}
+
+export interface KsbVerifierRuleOutcome {
+  ruleName: string;
+  verifierType: string;
+  result: 'pending' | 'passed' | 'failed' | 'timed_out';
+  evidenceJson: string;
+  durationMs: number;
+}
+
+export interface KsbDispatchResult {
+  bond: KsbBondDetail;
+  statusBefore: KsbBondStatus;
+  statusAfter: KsbBondStatus;
+  outcomes: KsbVerifierRuleOutcome[];
 }
 
 export interface KsbClientOptions {
@@ -407,6 +433,20 @@ export class KsbClient {
 
   autoVerify() {
     return this.request<KsbCronRunResult>('/api/v1/cron/auto-verify', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }, 'operator');
+  }
+
+  dispatchVerification(bondId: string, input: DispatchKsbVerificationInput = {}) {
+    return this.request<KsbDispatchResult>(`/api/v1/bonds/${encodeURIComponent(bondId)}/dispatch`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }, 'operator');
+  }
+
+  dispatchVerifiers() {
+    return this.request<KsbCronRunResult>('/api/v1/cron/dispatch-verifiers', {
       method: 'POST',
       body: JSON.stringify({}),
     }, 'operator');

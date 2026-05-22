@@ -270,9 +270,36 @@ export interface KsbPartyScoreView {
 }
 
 export interface KsbCronRunResult {
-  action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history';
+  action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history' | 'dispatch-verifiers';
   scanned: number;
   updated: number;
   bondIds: string[];
   at: string;
+}
+
+export interface DispatchVerifierRuleInput {
+  ruleName: string;
+  /** Runtime params merged over the static params in verifierConfigJson. */
+  params?: Record<string, unknown>;
+}
+
+export interface DispatchKsbVerificationInput {
+  inputs?: DispatchVerifierRuleInput[];
+  actorId?: string | null;
+  summary?: string | null;
+}
+
+export interface KsbVerifierRuleOutcome {
+  ruleName: string;
+  verifierType: string;
+  result: 'pending' | 'passed' | 'failed' | 'timed_out';
+  evidenceJson: string;
+  durationMs: number;
+}
+
+export interface KsbDispatchResult {
+  bond: KsbBondDetail;
+  statusBefore: KsbBondStatus;
+  statusAfter: KsbBondStatus;
+  outcomes: KsbVerifierRuleOutcome[];
 }

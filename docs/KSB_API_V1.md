@@ -10,6 +10,7 @@ Current routes:
 - `POST /api/v1/bonds`
 - `GET /api/v1/bonds/:bondId`
 - `POST /api/v1/bonds/:bondId/submit`
+- `POST /api/v1/bonds/:bondId/dispatch`
 - `POST /api/v1/bonds/:bondId/contest`
 - `POST /api/v1/bonds/:bondId/release`
 - `POST /api/v1/bonds/:bondId/slash`
@@ -18,6 +19,7 @@ Current routes:
 - `GET /api/v1/parties/:addr/score`
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
+- `POST /api/v1/cron/dispatch-verifiers`
 - `POST /api/v1/cron/rebuild-party-history`
 - `GET /api/v1/verifier-rules`
 
@@ -33,10 +35,12 @@ Every route:
 
 ### Operator-authenticated routes
 - `POST /api/v1/apps/register`
+- `POST /api/v1/bonds/:bondId/dispatch`
 - `POST /api/v1/bonds/:bondId/release`
 - `POST /api/v1/bonds/:bondId/slash`
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
+- `POST /api/v1/cron/dispatch-verifiers`
 - `POST /api/v1/cron/rebuild-party-history`
 
 Operator auth currently requires:
@@ -144,6 +148,32 @@ Behavior:
   - `failed`
   - `timed_out`
   - `contested`
+
+### `POST /api/v1/bonds/:bondId/dispatch`
+Runs the verifier hub for a single bond. Operator authenticated.
+
+Unlike `submit`, which records a caller-supplied result, `dispatch` executes
+each rule declared in `verifierConfigJson` and records the protocol-computed
+verdict.
+
+Request body (all optional):
+- `inputs` array of runtime params merged over the static config params:
+  - `ruleName` required
+  - `params` object of runtime values (a claimed completion time, a signature, an oracle query)
+- `actorId` optional string
+- `summary` optional string
+
+Behavior:
+- allowed from `proposed`, `committed`, `active`, `verified`, `failed`, `timed_out`
+- executes each built-in rule through the verifier hub
+- rules missing required runtime inputs resolve to `pending`
+- upserts `ksb_verifications` rows with `verifier_signature` set to `ksb-hub`
+- recomputes bond status from the full verification set
+
+Returns:
+- `bond` full bond detail
+- `statusBefore` and `statusAfter`
+- `outcomes` per-rule result, verifier type, evidence JSON, and duration ms
 
 ### `POST /api/v1/bonds/:bondId/contest`
 Contests a resolved or disputed bond outcome.
@@ -289,6 +319,19 @@ Behavior:
   - otherwise `active`
 - appends a resolver event when a status changes
 - intended to be idempotent through no-op status checks
+
+### `POST /api/v1/cron/dispatch-verifiers`
+Bulk verifier hub run. Operator authenticated.
+
+Behavior:
+- scans up to 100 bonds in `committed` or `active` status, oldest first
+- runs `dispatch` for each bond
+- rules that need runtime inputs not embedded in the config stay `pending`
+- bonds with no dispatchable rules or a transient failure are skipped
+- idempotent: a skipped bond is retried on the next run
+
+Returns a `KsbCronRunResult` with `action` set to `dispatch-verifiers` and
+`bondIds` listing bonds whose status changed.
 
 ### `POST /api/v1/cron/rebuild-party-history`
 Maintenance route that rebuilds `ksb_party_history` from canonical KSB tables.

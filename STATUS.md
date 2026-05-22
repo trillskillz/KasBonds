@@ -44,6 +44,7 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - added a first verifier queue view with counts, review-focused bond buckets, and clearer execution handoff cues for approved versus rejected bonds
 - added the built-in verifier rule catalog covering http, content, time, signature, and oracle checks, and merged it into the verifier-rule listing endpoint
 - added launch-grade SDK examples for the agent SLA and bug bounty use cases, plus a typecheck path that compiles every example against the SDK source
+- implemented the verifier hub: a dispatch engine that executes built-in rules (http, content, time, signature, oracle), persists protocol-computed results, and recomputes bond status, exposed through a per-bond dispatch route and a bulk dispatch cron
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -55,4 +56,4 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Tighten spec-to-code alignment and add more than one launch-grade SDK example before publishing.
+Add composable AND/OR rule sets and a custom verifier registration path on top of the verifier hub, then prepare the SDK for npm publishing.

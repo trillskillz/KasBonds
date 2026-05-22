@@ -29,12 +29,13 @@ Implemented now:
 - resolver and maintenance cron routes
 - verifier rule listing
 - built-in verifier rule catalog (http, content, time, signature, oracle)
+- verifier hub dispatch (protocol-computed rule execution)
 - initial OpenAPI spec
 - initial SDK skeleton
 
 Still in progress:
-- verifier hub dispatch and custom rule execution
-- SDK packaging and examples
+- composable rule sets and custom verifier registration
+- SDK packaging and npm publishing
 
 See also:
 - `STATUS.md`
@@ -104,6 +105,7 @@ Current KSB protocol routes:
 - `GET /api/v1/bonds/:bondId`
 - `GET /api/v1/bonds/:bondId/status`
 - `POST /api/v1/bonds/:bondId/submit`
+- `POST /api/v1/bonds/:bondId/dispatch`
 - `POST /api/v1/bonds/:bondId/contest`
 - `POST /api/v1/bonds/:bondId/release`
 - `POST /api/v1/bonds/:bondId/slash`
@@ -111,6 +113,7 @@ Current KSB protocol routes:
 - `GET /api/v1/parties/:addr/score`
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
+- `POST /api/v1/cron/dispatch-verifiers`
 - `POST /api/v1/cron/rebuild-party-history`
 - `GET /api/v1/verifier-rules`
 

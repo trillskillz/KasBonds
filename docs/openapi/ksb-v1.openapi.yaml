@@ -384,7 +384,7 @@ components:
     KsbCronRunResult:
       type: object
       properties:
-        action: { type: string, enum: [resolve-expired, auto-verify, rebuild-party-history] }
+        action: { type: string, enum: [resolve-expired, auto-verify, rebuild-party-history, dispatch-verifiers] }
         scanned: { type: integer }
         updated: { type: integer }
         bondIds:
@@ -392,6 +392,38 @@ components:
           items: { type: string }
         at: { type: string }
       required: [action, scanned, updated, bondIds, at]
+    DispatchKsbVerificationInput:
+      type: object
+      properties:
+        inputs:
+          type: array
+          items:
+            type: object
+            properties:
+              ruleName: { type: string }
+              params: { type: object, additionalProperties: true }
+            required: [ruleName]
+        actorId: { type: [string, 'null'] }
+        summary: { type: [string, 'null'] }
+    KsbVerifierRuleOutcome:
+      type: object
+      properties:
+        ruleName: { type: string }
+        verifierType: { type: string }
+        result: { type: string, enum: [pending, passed, failed, timed_out] }
+        evidenceJson: { type: string }
+        durationMs: { type: integer }
+      required: [ruleName, verifierType, result, evidenceJson, durationMs]
+    KsbDispatchResult:
+      type: object
+      properties:
+        bond: { $ref: '#/components/schemas/KsbBondDetail' }
+        statusBefore: { $ref: '#/components/schemas/KsbBondStatus' }
+        statusAfter: { $ref: '#/components/schemas/KsbBondStatus' }
+        outcomes:
+          type: array
+          items: { $ref: '#/components/schemas/KsbVerifierRuleOutcome' }
+      required: [bond, statusBefore, statusAfter, outcomes]
 paths:
   /api/v1/apps/register:
     post:
@@ -504,6 +536,28 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/KsbBondDetail' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}/dispatch:
+    post:
+      summary: Dispatch the verifier hub for a bond
+      description: Operator authenticated. Executes the bond verifier rules and records protocol-computed results.
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DispatchKsbVerificationInput' }
+      responses:
+        '200':
+          description: Dispatch result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbDispatchResult' }
         default:
           description: Error
           content:
@@ -654,6 +708,23 @@ paths:
   /api/v1/cron/auto-verify:
     post:
       summary: Derive bond status from verifications
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Cron result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbCronRunResult' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/cron/dispatch-verifiers:
+    post:
+      summary: Dispatch the verifier hub across in-progress bonds
       security:
         - OperatorApiKey: []
         - BearerAuth: []
