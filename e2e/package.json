@@ -1,0 +1,19 @@
+{
+  "name": "ksb-e2e-verify",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "KSB Phase 9 end-to-end verification harness",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "verify": "node --experimental-strip-types src/verify.ts"
+  },
+  "dependencies": {
+    "ksb-sdk": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.3"
+  }
+}

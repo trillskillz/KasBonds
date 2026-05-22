@@ -54,6 +54,7 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - added a party reputation lookup panel to the operator console: an address lookup that renders the reputation score, summary stats, verifier activity, per-app signals, and recent validations from `GET /api/v1/parties/:addr/reputation`
 - began Phase 8 (reference integrations): added the `references/` directory and the first standalone reference app, an agent-to-agent SLA bond built on `ksb-sdk` with its own package, runnable flow, and forkable docs
 - completed the Phase 8 reference set: added the bug bounty escrow reference (composed AND/OR rule set plus a dispute path) and the personal commitment reference (a `deadline_time_check` bond showing the verifier-hub runtime-input pattern), each a standalone `ksb-sdk` project with forkable docs
+- began Phase 9 (testnet end-to-end): added the `e2e/` verification harness that drives the protocol surface through 12 lifecycle cases against a running instance, and created `TESTNET_VERIFICATION.md` tracking all Phase 9 cases and on-chain transaction evidence
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -65,4 +66,4 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Begin Phase 9: run the reference integrations and protocol flows end to end against the live KSB instance on testnet 12 and record the results.
+Run the `e2e/` harness against a live testnet 12 KSB deployment, complete the on-chain release and slash steps, and fill in `TESTNET_VERIFICATION.md` with the results.

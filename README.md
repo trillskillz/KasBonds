@@ -44,6 +44,7 @@ See also:
 - `STATUS.md`
 - `PLAN.md`
 - `GAP_ANALYSIS.md`
+- `TESTNET_VERIFICATION.md`
 - `docs/KSB_API_V1.md`
 
 ## Repo layout
@@ -56,6 +57,7 @@ See also:
 - `artifacts/` - compiled covenant artifacts
 - `scripts/` - TN12 and schema utility scripts
 - `references/` - standalone reference integrations built on `ksb-sdk`
+- `e2e/` - Phase 9 end-to-end verification harness
 - `docs/` - operator and protocol docs
 - `vendor/` - vendored dependencies used by the proof harness
 
