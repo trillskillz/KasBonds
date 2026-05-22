@@ -20,6 +20,7 @@ import type {
   ContestKsbBondInput,
   SubmitKsbBondProofInput,
 } from './types';
+import { BUILT_IN_VERIFIER_RULES, isBuiltInVerifierRule } from './verifier-rules';
 
 function makeAppId() {
   return `app_${randomUUID().replace(/-/g, '').slice(0, 16)}`;
@@ -320,6 +321,7 @@ function rowToVerifierRule(row: any): KsbVerifierRuleRecord {
     verifierType: String(row.verifier_type),
     defaultTimeoutMs: Number(row.default_timeout_ms),
     createdAt: String(row.created_at),
+    source: 'custom',
   };
 }
 
@@ -717,7 +719,14 @@ export async function listKsbVerifierRules(db: any): Promise<KsbVerifierRuleReco
     args: {},
   });
 
-  return result.rows.map(rowToVerifierRule);
+  // The protocol catalog of built-in rules is always present. Custom rules
+  // stored by apps are merged in, and a custom row never shadows a built-in
+  // rule of the same name.
+  const customRules = result.rows
+    .map(rowToVerifierRule)
+    .filter((rule: KsbVerifierRuleRecord) => !isBuiltInVerifierRule(rule.name));
+
+  return [...BUILT_IN_VERIFIER_RULES, ...customRules].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getKsbBondDetail(db: any, idOrPublicId: string): Promise<KsbBondDetail> {

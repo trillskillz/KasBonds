@@ -303,15 +303,27 @@ Behavior:
 - useful after schema changes or for reconciling older rows
 
 ### `GET /api/v1/verifier-rules`
-Lists canonical verifier rules known to the KSB protocol layer.
+Lists verifier rules known to the KSB protocol layer.
 
-Returns:
+The response always includes the built-in protocol rule catalog and merges in
+any custom rules declared by registered apps. A custom rule never shadows a
+built-in rule of the same name.
+
+Built-in rules:
+- `http_status_check` - HTTP endpoint returns an expected status code
+- `http_content_check` - response body contains or omits required content
+- `deadline_time_check` - completion timestamp lands on or before the deadline
+- `signature_check` - signature verifies against a known public key
+- `external_oracle_check` - decision delegated to a signed external oracle
+
+Each rule returns:
 - rule name
 - description
 - schema JSON snapshot
-- verifier type
+- verifier type (`http`, `content`, `time`, `signature`, `oracle`, or `custom`)
 - default timeout ms
-- created timestamp
+- created timestamp (`null` for built-in rules)
+- source (`builtin` or `custom`)
 
 ### `GET /api/v1/bonds/:bondId/status`
 Reads a lighter-weight status polling view for a canonical KSB bond.

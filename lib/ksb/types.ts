@@ -139,7 +139,10 @@ export interface KsbVerifierRuleRecord {
   schemaJson: string;
   verifierType: string;
   defaultTimeoutMs: number;
-  createdAt: string;
+  /** Null for built-in protocol rules, an ISO timestamp for custom DB-stored rules. */
+  createdAt: string | null;
+  /** 'builtin' for protocol catalog rules, 'custom' for app-declared rules. */
+  source: 'builtin' | 'custom';
 }
 
 export interface KsbSlashingEventRecord {

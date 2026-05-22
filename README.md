@@ -28,11 +28,12 @@ Implemented now:
 - party history and score endpoints
 - resolver and maintenance cron routes
 - verifier rule listing
+- built-in verifier rule catalog (http, content, time, signature, oracle)
 - initial OpenAPI spec
 - initial SDK skeleton
 
 Still in progress:
-- verifier hub and custom rule execution
+- verifier hub dispatch and custom rule execution
 - SDK packaging and examples
 
 See also:

@@ -182,8 +182,9 @@ components:
         schemaJson: { type: string }
         verifierType: { type: string }
         defaultTimeoutMs: { type: integer }
-        createdAt: { type: string }
-      required: [name, description, schemaJson, verifierType, defaultTimeoutMs, createdAt]
+        createdAt: { type: [string, 'null'] }
+        source: { type: string, enum: [builtin, custom] }
+      required: [name, description, schemaJson, verifierType, defaultTimeoutMs, createdAt, source]
     KsbVerificationRecord:
       type: object
       properties:
