@@ -65,6 +65,7 @@ The `examples/` directory holds runnable end-to-end flows:
 - `quickstart.ts` - operator app bootstrap, bond creation, status read
 - `agent-sla.ts` - agent-to-agent SLA bond verified by `http_status_check`
 - `bug-bounty.ts` - bug bounty escrow with a composed `AND`/`OR` rule set, including the contest path
+- `custom-verifier.ts` - register an app-owned signed webhook verifier and dispatch it inside a bond
 
 Built-in rule names referenced by the examples come from the protocol catalog
 returned by `GET /api/v1/verifier-rules`.
