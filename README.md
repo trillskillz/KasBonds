@@ -35,10 +35,10 @@ Implemented now:
 - ERC-8004 aligned party reputation profiles
 - initial OpenAPI spec
 - `ksb-sdk` package published to npm
-- agent SLA reference integration
+- three reference integrations (agent SLA, bug bounty, personal commitment)
 
 Still in progress:
-- Phase 8 reference integrations (bug bounty, personal commitment)
+- Phase 9 testnet end-to-end verification
 
 See also:
 - `STATUS.md`

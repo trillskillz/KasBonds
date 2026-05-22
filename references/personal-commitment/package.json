@@ -1,0 +1,19 @@
+{
+  "name": "ksb-reference-personal-commitment",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "KSB reference integration: a personal commitment bond",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "start": "node --experimental-strip-types src/index.ts"
+  },
+  "dependencies": {
+    "ksb-sdk": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.3"
+  }
+}
