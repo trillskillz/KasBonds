@@ -125,6 +125,15 @@ export interface KsbVerificationRecord {
   verifiedAt: string;
 }
 
+export interface KsbVerifierRuleRecord {
+  name: string;
+  description: string;
+  schemaJson: string;
+  verifierType: string;
+  defaultTimeoutMs: number;
+  createdAt: string;
+}
+
 export interface KsbSlashingEventRecord {
   id: string;
   bondId: string;

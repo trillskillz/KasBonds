@@ -12,6 +12,7 @@ import type {
   RecordKsbReleaseExecutionInput,
   RecordKsbSlashExecutionInput,
   KsbSlashingEventRecord,
+  KsbVerifierRuleRecord,
   KsbVerificationRecord,
   RegisterAppInput,
   RegisteredAppRecord,
@@ -223,6 +224,17 @@ function rowToVerification(row: any): KsbVerificationRecord {
     evidenceJson: row.evidence_json ?? null,
     verifierSignature: String(row.verifier_signature),
     verifiedAt: String(row.verified_at),
+  };
+}
+
+function rowToVerifierRule(row: any): KsbVerifierRuleRecord {
+  return {
+    name: String(row.name),
+    description: String(row.description),
+    schemaJson: String(row.schema_json),
+    verifierType: String(row.verifier_type),
+    defaultTimeoutMs: Number(row.default_timeout_ms),
+    createdAt: String(row.created_at),
   };
 }
 
@@ -613,6 +625,15 @@ export async function listKsbBonds(
   });
 
   return result.rows.map(rowToBond);
+}
+
+export async function listKsbVerifierRules(db: any): Promise<KsbVerifierRuleRecord[]> {
+  const result = await (db as any).$client.execute({
+    sql: `SELECT * FROM ksb_verifier_rules ORDER BY name ASC`,
+    args: {},
+  });
+
+  return result.rows.map(rowToVerifierRule);
 }
 
 export async function getKsbBondDetail(db: any, idOrPublicId: string): Promise<KsbBondDetail> {

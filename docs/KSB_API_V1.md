@@ -19,6 +19,7 @@ Current routes:
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
 - `POST /api/v1/cron/rebuild-party-history`
+- `GET /api/v1/verifier-rules`
 
 Every route:
 - exports `export const dynamic = 'force-dynamic'`
@@ -242,6 +243,17 @@ Behavior:
 - reapplies terminal release/slash totals from canonical status plus `ksb_slashing_events`
 - useful after schema changes or for reconciling older rows
 
+### `GET /api/v1/verifier-rules`
+Lists canonical verifier rules known to the KSB protocol layer.
+
+Returns:
+- rule name
+- description
+- schema JSON snapshot
+- verifier type
+- default timeout ms
+- created timestamp
+
 ### `GET /api/v1/bonds/:bondId/status`
 Reads a lighter-weight status polling view for a canonical KSB bond.
 
@@ -258,5 +270,5 @@ This is the first KSB protocol slice.
 It now includes app registration plus canonical bond creation and read operations.
 ## Next recommended slice
 
-1. party-history backfill/update flows
-2. auth/signature expectations for operator-facing resolution routes
+1. auth/signature expectations for operator-facing resolution and maintenance routes
+2. stronger verifier-role attribution semantics beyond heuristic config parsing

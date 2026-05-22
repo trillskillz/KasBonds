@@ -10,7 +10,7 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - drafted the first canonical KSB migration in `schema/002_ksb_canonical.sql`
 - updated the schema apply script to run numbered migrations in order
 - added the first `/api/v1` KSB protocol routes for app registration, canonical bond list, and canonical bond detail reads
-- added canonical `/api/v1` proof submission, contest handling, release/slash execution, party-history, party-score, lightweight status polling, first cron resolver routes, and a party-history rebuild route
+- added canonical `/api/v1` proof submission, contest handling, release/slash execution, party-history, party-score, lightweight status polling, first cron resolver routes, a party-history rebuild route, and verifier-rule listing
 - added protocol-versioned response handling for `/api/v1`
 - added authenticated canonical bond creation under `POST /api/v1/bonds`
 - created `bonds/` workspace folder
