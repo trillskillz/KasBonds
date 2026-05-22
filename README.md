@@ -16,29 +16,44 @@ This repo currently combines:
 
 ## Current status
 
-Implemented now:
-- TN12 release-path proof
-- TN12 slash-path proof
-- canonical KSB schema draft
-- app registration route
-- canonical bond create/list/detail routes
-- bond status polling route
-- proof submission route
-- contest route
-- party history and score endpoints
-- resolver and maintenance cron routes
-- verifier rule listing
+### Phase status
+
+The KSB plan runs in ten phases (see `PLAN.md`).
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 1 | Toccata testnet covenant proof | Complete - TN12 release and slash paths confirmed |
+| 2 | Data layer | Complete - canonical KSB schema |
+| 3 | Protocol layer API | Complete - versioned `/api/v1` surface |
+| 4 | Verifier hub | Complete - built-in rule catalog, hub dispatch, composable AND/OR rule sets, custom verifier registration |
+| 5 | Cron resolvers | Complete - resolve-expired, auto-verify, dispatch-verifiers, rebuild-party-history |
+| 6 | SDK | Complete - published to npm as `ksb-sdk` |
+| 7 | Reputation layer | Complete - ERC-8004 aligned reputation profiles |
+| 8 | Reference integrations | Complete - agent SLA, bug bounty, personal commitment |
+| 9 | Testnet end-to-end | In progress - `e2e/` harness built, awaiting a live testnet 12 run |
+| 10 | Mainnet launch | Not started - gated; runbook prepared in `MAINNET_LAUNCH.md` |
+
+### Implemented now
+
+- TN12 release-path and slash-path covenant proofs
+- canonical KSB schema and the versioned `/api/v1` protocol surface
+- app registration, canonical bond create/list/detail, status polling
+- proof submission and contest routes
 - built-in verifier rule catalog (http, content, time, signature, oracle)
 - verifier hub dispatch (protocol-computed rule execution)
 - composable AND/OR verifier rule sets
 - custom verifier registration (app-owned signed webhooks)
-- ERC-8004 aligned party reputation profiles
-- initial OpenAPI spec
-- `ksb-sdk` package published to npm
-- three reference integrations (agent SLA, bug bounty, personal commitment)
+- resolver and maintenance cron routes
+- party history, score, and ERC-8004 aligned reputation profiles
+- OpenAPI spec and the published `ksb-sdk` package
+- three reference integrations and the Phase 9 verification harness
 
-Still in progress:
-- Phase 9 testnet end-to-end verification
+### Gating the remaining phases
+
+- Phase 9 needs a live testnet 12 deployment to run `e2e/` and the on-chain
+  release and slash steps; results land in `TESTNET_VERIFICATION.md`
+- Phase 10 is blocked on three hard gates: Toccata mainnet activation
+  confirmed, the external security audit complete, and Phase 9 green
 
 See also:
 - `STATUS.md`
