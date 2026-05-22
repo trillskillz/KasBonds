@@ -1,0 +1,706 @@
+openapi: 3.1.0
+info:
+  title: Kaspa Service Bonds API
+  version: 0.1.0
+  description: |
+    Initial OpenAPI description for the KSB protocol-oriented /api/v1 surface.
+servers:
+  - url: http://localhost:3000
+    description: Local development
+components:
+  securitySchemes:
+    AppApiKey:
+      type: apiKey
+      in: header
+      name: x-ksb-api-key
+    OperatorApiKey:
+      type: apiKey
+      in: header
+      name: x-ksb-operator-key
+    BearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    BondId:
+      name: bondId
+      in: path
+      required: true
+      schema:
+        type: string
+    PartyAddress:
+      name: addr
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    JsonValue:
+      oneOf:
+        - type: object
+          additionalProperties: true
+        - type: array
+          items: true
+        - type: string
+        - type: number
+        - type: integer
+        - type: boolean
+        - type: 'null'
+    KsbBondStatus:
+      type: string
+      enum: [proposed, committed, active, verified, failed, timed_out, contested, arbitration, released, slashed, failed_execution]
+    RegisterAppInput:
+      type: object
+      properties:
+        name: { type: string }
+        contact: { type: [string, 'null'] }
+        webhookUrl: { type: [string, 'null'] }
+        defaultUseCaseTemplate: { type: [string, 'null'] }
+      required: [name]
+    RegisteredAppRecord:
+      type: object
+      properties:
+        appId: { type: string }
+        name: { type: string }
+        contact: { type: [string, 'null'] }
+        webhookUrl: { type: [string, 'null'] }
+        defaultUseCaseTemplate: { type: string }
+        totalBonds: { type: integer }
+        totalVolumeSompi: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [appId, name, contact, webhookUrl, defaultUseCaseTemplate, totalBonds, totalVolumeSompi, createdAt, updatedAt]
+    RegisteredAppSecret:
+      type: object
+      properties:
+        app:
+          $ref: '#/components/schemas/RegisteredAppRecord'
+        apiKey:
+          type: string
+      required: [app, apiKey]
+    CreateKsbBondInput:
+      type: object
+      properties:
+        useCaseTemplate: { type: [string, 'null'] }
+        providerAddress: { type: string }
+        counterpartyAddress: { type: string }
+        bondAmountSompi: { type: string }
+        paymentAmountSompi: { type: [string, 'null'] }
+        deadlineUnix: { type: integer }
+        verifierConfigJson:
+          $ref: '#/components/schemas/JsonValue'
+        slashDistributionJson:
+          $ref: '#/components/schemas/JsonValue'
+        externalRef: { type: [string, 'null'] }
+        covenantScriptVersion: { type: [string, 'null'] }
+        covenantArtifactRef: { type: [string, 'null'] }
+        covenantArgsJson:
+          oneOf:
+            - $ref: '#/components/schemas/JsonValue'
+            - type: 'null'
+        covenantUtxo: { type: [string, 'null'] }
+        lockTxHash: { type: [string, 'null'] }
+      required: [providerAddress, counterpartyAddress, bondAmountSompi, deadlineUnix, verifierConfigJson, slashDistributionJson]
+    SubmitKsbBondProofRuleInput:
+      type: object
+      properties:
+        ruleName: { type: string }
+        result:
+          type: string
+          enum: [pending, passed, failed, timed_out, contested]
+        evidenceJson:
+          oneOf:
+            - $ref: '#/components/schemas/JsonValue'
+            - type: 'null'
+        verifierSignature: { type: [string, 'null'] }
+      required: [ruleName]
+    SubmitKsbBondProofInput:
+      type: object
+      properties:
+        proofJson:
+          oneOf:
+            - $ref: '#/components/schemas/JsonValue'
+            - type: 'null'
+        submittedBy: { type: [string, 'null'] }
+        summary: { type: [string, 'null'] }
+        verifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmitKsbBondProofRuleInput'
+    ContestKsbBondInput:
+      type: object
+      properties:
+        submittedBy: { type: [string, 'null'] }
+        summary: { type: [string, 'null'] }
+        reason: { type: [string, 'null'] }
+        evidenceJson:
+          oneOf:
+            - $ref: '#/components/schemas/JsonValue'
+            - type: 'null'
+        ruleNames:
+          type: array
+          items: { type: string }
+        moveToArbitration: { type: boolean }
+    RecordKsbReleaseExecutionInput:
+      type: object
+      properties:
+        resolutionTxHash: { type: string }
+        executionPayloadJson:
+          $ref: '#/components/schemas/JsonValue'
+        executionSignature: { type: string }
+        executionSigner: { type: string }
+        executionSignedAt: { type: string, format: date-time }
+        actorId: { type: [string, 'null'] }
+        summary: { type: [string, 'null'] }
+      required: [resolutionTxHash, executionPayloadJson, executionSignature, executionSigner, executionSignedAt]
+    RecordKsbSlashExecutionInput:
+      type: object
+      properties:
+        resolutionTxHash: { type: string }
+        reason: { type: string }
+        slashAmountSompi: { type: string }
+        distributionJson:
+          $ref: '#/components/schemas/JsonValue'
+        executionPayloadJson:
+          $ref: '#/components/schemas/JsonValue'
+        executionSignature: { type: string }
+        executionSigner: { type: string }
+        executionSignedAt: { type: string, format: date-time }
+        actorId: { type: [string, 'null'] }
+        summary: { type: [string, 'null'] }
+      required: [resolutionTxHash, reason, slashAmountSompi, distributionJson, executionPayloadJson, executionSignature, executionSigner, executionSignedAt]
+    KsbVerifierRuleRecord:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        schemaJson: { type: string }
+        verifierType: { type: string }
+        defaultTimeoutMs: { type: integer }
+        createdAt: { type: string }
+      required: [name, description, schemaJson, verifierType, defaultTimeoutMs, createdAt]
+    KsbVerificationRecord:
+      type: object
+      properties:
+        id: { type: string }
+        bondId: { type: string }
+        ruleName: { type: string }
+        result: { type: string }
+        evidenceJson: { type: [string, 'null'] }
+        verifierSignature: { type: string }
+        verifiedAt: { type: string }
+      required: [id, bondId, ruleName, result, evidenceJson, verifierSignature, verifiedAt]
+    KsbSlashingEventRecord:
+      type: object
+      properties:
+        id: { type: string }
+        bondId: { type: string }
+        reason: { type: string }
+        slashAmountSompi: { type: string }
+        distributionJson: { type: string }
+        slashTxHash: { type: string }
+        createdAt: { type: string }
+      required: [id, bondId, reason, slashAmountSompi, distributionJson, slashTxHash, createdAt]
+    KsbBondEventRecord:
+      type: object
+      properties:
+        id: { type: string }
+        bondId: { type: string }
+        eventType: { type: string }
+        actorType: { type: string }
+        actorId: { type: [string, 'null'] }
+        summary: { type: string }
+        dataJson: { type: [string, 'null'] }
+        createdAt: { type: string }
+      required: [id, bondId, eventType, actorType, actorId, summary, dataJson, createdAt]
+    KsbBondRecord:
+      type: object
+      properties:
+        id: { type: string }
+        publicId: { type: string }
+        appId: { type: string }
+        useCaseTemplate: { type: string }
+        providerAddress: { type: string }
+        counterpartyAddress: { type: string }
+        bondAmountSompi: { type: string }
+        paymentAmountSompi: { type: [string, 'null'] }
+        deadlineUnix: { type: integer }
+        verifierConfigJson: { type: string }
+        slashDistributionJson: { type: string }
+        status: { $ref: '#/components/schemas/KsbBondStatus' }
+        externalRef: { type: [string, 'null'] }
+        covenantScriptVersion: { type: [string, 'null'] }
+        covenantArtifactRef: { type: [string, 'null'] }
+        covenantArgsJson: { type: [string, 'null'] }
+        covenantUtxo: { type: [string, 'null'] }
+        lockTxHash: { type: [string, 'null'] }
+        resolutionTxHash: { type: [string, 'null'] }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+        resolvedAt: { type: [string, 'null'] }
+      required: [id, publicId, appId, useCaseTemplate, providerAddress, counterpartyAddress, bondAmountSompi, paymentAmountSompi, deadlineUnix, verifierConfigJson, slashDistributionJson, status, externalRef, covenantScriptVersion, covenantArtifactRef, covenantArgsJson, covenantUtxo, lockTxHash, resolutionTxHash, createdAt, updatedAt, resolvedAt]
+    KsbBondDetail:
+      type: object
+      properties:
+        bond: { $ref: '#/components/schemas/KsbBondRecord' }
+        app:
+          oneOf:
+            - $ref: '#/components/schemas/RegisteredAppRecord'
+            - type: 'null'
+        verifications:
+          type: array
+          items: { $ref: '#/components/schemas/KsbVerificationRecord' }
+        slashingEvent:
+          oneOf:
+            - $ref: '#/components/schemas/KsbSlashingEventRecord'
+            - type: 'null'
+        events:
+          type: array
+          items: { $ref: '#/components/schemas/KsbBondEventRecord' }
+      required: [bond, app, verifications, slashingEvent, events]
+    KsbBondStatusView:
+      type: object
+      properties:
+        bondId: { type: string }
+        publicId: { type: string }
+        appId: { type: string }
+        useCaseTemplate: { type: string }
+        status: { $ref: '#/components/schemas/KsbBondStatus' }
+        providerAddress: { type: string }
+        counterpartyAddress: { type: string }
+        deadlineUnix: { type: integer }
+        lockTxHash: { type: [string, 'null'] }
+        resolutionTxHash: { type: [string, 'null'] }
+        resolvedAt: { type: [string, 'null'] }
+        updatedAt: { type: string }
+        verificationSummary:
+          type: object
+          properties:
+            total: { type: integer }
+            pending: { type: integer }
+            passed: { type: integer }
+            failed: { type: integer }
+            timedOut: { type: integer }
+            contested: { type: integer }
+          required: [total, pending, passed, failed, timedOut, contested]
+        lastEvent:
+          oneOf:
+            - $ref: '#/components/schemas/KsbBondEventRecord'
+            - type: 'null'
+      required: [bondId, publicId, appId, useCaseTemplate, status, providerAddress, counterpartyAddress, deadlineUnix, lockTxHash, resolutionTxHash, resolvedAt, updatedAt, verificationSummary, lastEvent]
+    KsbPartyHistoryView:
+      type: object
+      properties:
+        address: { type: string }
+        summary:
+          type: object
+          properties:
+            totalBonds: { type: integer }
+            asProvider: { type: integer }
+            asCounterparty: { type: integer }
+            asVerifier: { type: integer }
+            released: { type: integer }
+            slashed: { type: integer }
+            active: { type: integer }
+            totalBondedSompi: { type: string }
+            totalSlashedValueSompi: { type: string }
+          required: [totalBonds, asProvider, asCounterparty, asVerifier, released, slashed, active, totalBondedSompi, totalSlashedValueSompi]
+        apps:
+          type: array
+          items:
+            type: object
+            properties:
+              appId: { type: string }
+              appName: { type: [string, 'null'] }
+              roles:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    role: { type: string, enum: [provider, counterparty, verifier] }
+                    totalBondedSompi: { type: string }
+                    bondsReleased: { type: integer }
+                    bondsSlashed: { type: integer }
+                    totalSlashedValueSompi: { type: string }
+                    lastUpdated: { type: [string, 'null'] }
+                  required: [role, totalBondedSompi, bondsReleased, bondsSlashed, totalSlashedValueSompi, lastUpdated]
+            required: [appId, appName, roles]
+        recentBonds:
+          type: array
+          items:
+            type: object
+            properties:
+              publicId: { type: string }
+              appId: { type: string }
+              role: { type: string, enum: [provider, counterparty] }
+              status: { $ref: '#/components/schemas/KsbBondStatus' }
+              bondAmountSompi: { type: string }
+              createdAt: { type: string }
+            required: [publicId, appId, role, status, bondAmountSompi, createdAt]
+      required: [address, summary, apps, recentBonds]
+    KsbPartyScoreView:
+      type: object
+      properties:
+        address: { type: string }
+        score:
+          type: object
+          properties:
+            releaseRatio: { type: [number, 'null'] }
+            slashRatio: { type: [number, 'null'] }
+            activeRiskIndicator: { type: number }
+            totalBondedSompi: { type: string }
+            totalSlashedValueSompi: { type: string }
+            releasedCount: { type: integer }
+            slashedCount: { type: integer }
+            verifierActivityCount: { type: integer }
+          required: [releaseRatio, slashRatio, activeRiskIndicator, totalBondedSompi, totalSlashedValueSompi, releasedCount, slashedCount, verifierActivityCount]
+        subScores:
+          type: array
+          items:
+            type: object
+            properties:
+              appId: { type: string }
+              appName: { type: [string, 'null'] }
+              releaseRatio: { type: [number, 'null'] }
+              slashRatio: { type: [number, 'null'] }
+              totalBondedSompi: { type: string }
+              totalSlashedValueSompi: { type: string }
+              releasedCount: { type: integer }
+              slashedCount: { type: integer }
+            required: [appId, appName, releaseRatio, slashRatio, totalBondedSompi, totalSlashedValueSompi, releasedCount, slashedCount]
+        compatibility:
+          type: object
+          properties:
+            standard: { type: string, enum: [erc-8004-compatible-shape-pending] }
+            status: { type: string, enum: [partial] }
+          required: [standard, status]
+      required: [address, score, subScores, compatibility]
+    KsbCronRunResult:
+      type: object
+      properties:
+        action: { type: string, enum: [resolve-expired, auto-verify, rebuild-party-history] }
+        scanned: { type: integer }
+        updated: { type: integer }
+        bondIds:
+          type: array
+          items: { type: string }
+        at: { type: string }
+      required: [action, scanned, updated, bondIds, at]
+paths:
+  /api/v1/apps/register:
+    post:
+      summary: Register an app
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAppInput'
+      responses:
+        '201':
+          description: Registered app secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredAppSecret'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/bonds:
+    get:
+      summary: List bonds
+      parameters:
+        - name: appId
+          in: query
+          schema: { type: string }
+        - name: providerAddress
+          in: query
+          schema: { type: string }
+        - name: counterpartyAddress
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/KsbBondStatus' }
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Bond list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bonds:
+                    type: array
+                    items: { $ref: '#/components/schemas/KsbBondRecord' }
+                required: [bonds]
+    post:
+      summary: Create bond
+      security:
+        - AppApiKey: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKsbBondInput'
+      responses:
+        '201':
+          description: Bond detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KsbBondDetail'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}:
+    get:
+      summary: Get bond detail
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      responses:
+        '200':
+          description: Bond detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbBondDetail' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}/submit:
+    post:
+      summary: Submit proof
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubmitKsbBondProofInput' }
+      responses:
+        '200':
+          description: Bond detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbBondDetail' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}/contest:
+    post:
+      summary: Contest bond
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContestKsbBondInput' }
+      responses:
+        '200':
+          description: Bond detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbBondDetail' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}/release:
+    post:
+      summary: Record release execution
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecordKsbReleaseExecutionInput' }
+      responses:
+        '200':
+          description: Bond detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbBondDetail' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}/slash:
+    post:
+      summary: Record slash execution
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecordKsbSlashExecutionInput' }
+      responses:
+        '200':
+          description: Bond detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbBondDetail' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/bonds/{bondId}/status:
+    get:
+      summary: Get bond status view
+      parameters:
+        - $ref: '#/components/parameters/BondId'
+      responses:
+        '200':
+          description: Bond status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbBondStatusView' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/parties/{addr}:
+    get:
+      summary: Get party history
+      parameters:
+        - $ref: '#/components/parameters/PartyAddress'
+      responses:
+        '200':
+          description: Party history
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbPartyHistoryView' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/parties/{addr}/score:
+    get:
+      summary: Get party score
+      parameters:
+        - $ref: '#/components/parameters/PartyAddress'
+      responses:
+        '200':
+          description: Party score
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbPartyScoreView' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/cron/resolve-expired:
+    post:
+      summary: Mark expired bonds timed out
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nowUnix: { type: integer }
+      responses:
+        '200':
+          description: Cron result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbCronRunResult' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/cron/auto-verify:
+    post:
+      summary: Derive bond status from verifications
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Cron result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbCronRunResult' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/cron/rebuild-party-history:
+    post:
+      summary: Rebuild party history
+      security:
+        - OperatorApiKey: []
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Cron result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KsbCronRunResult' }
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /api/v1/verifier-rules:
+    get:
+      summary: List verifier rules
+      responses:
+        '200':
+          description: Verifier rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rules:
+                    type: array
+                    items: { $ref: '#/components/schemas/KsbVerifierRuleRecord' }
+                required: [rules]
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }

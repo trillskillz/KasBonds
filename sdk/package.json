@@ -1,0 +1,10 @@
+{
+  "name": "@ksb/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Initial SDK skeleton for the Kaspa Service Bonds API",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

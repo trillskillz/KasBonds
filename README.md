@@ -25,12 +25,15 @@ Implemented now:
 - bond status polling route
 - proof submission route
 - contest route
+- party history and score endpoints
+- resolver and maintenance cron routes
+- verifier rule listing
+- initial OpenAPI spec
+- initial SDK skeleton
 
 Still in progress:
-- party history and score endpoints
-- cron resolver routes
 - verifier hub and custom rule execution
-- SDK packaging
+- SDK packaging and examples
 
 See also:
 - `STATUS.md`
@@ -101,8 +104,20 @@ Current KSB protocol routes:
 - `GET /api/v1/bonds/:bondId/status`
 - `POST /api/v1/bonds/:bondId/submit`
 - `POST /api/v1/bonds/:bondId/contest`
+- `POST /api/v1/bonds/:bondId/release`
+- `POST /api/v1/bonds/:bondId/slash`
+- `GET /api/v1/parties/:addr`
+- `GET /api/v1/parties/:addr/score`
+- `POST /api/v1/cron/resolve-expired`
+- `POST /api/v1/cron/auto-verify`
+- `POST /api/v1/cron/rebuild-party-history`
+- `GET /api/v1/verifier-rules`
 
 Details live in `docs/KSB_API_V1.md`.
+
+Protocol artifacts:
+- OpenAPI: `docs/openapi/ksb-v1.openapi.yaml`
+- SDK skeleton: `sdk/`
 
 ## Notes
 
