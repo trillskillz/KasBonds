@@ -1,4 +1,4 @@
-# @ksb/sdk
+# ksb-sdk
 
 TypeScript SDK for the Kaspa Service Bond Protocol (KSB). MIT licensed.
 
@@ -25,7 +25,7 @@ npm run build
 ## Quickstart
 
 ```ts
-import { KsbClient } from '@ksb/sdk';
+import { KsbClient } from 'ksb-sdk';
 
 const client = new KsbClient({
   baseUrl: 'http://localhost:3000',
@@ -85,7 +85,7 @@ for a pass or fail verdict.
 
 ## Publishing
 
-The package is configured for npm publishing under the public `@ksb` scope.
+The package is published to npm as the public unscoped package `ksb-sdk`.
 
 Releasing a version:
 
@@ -95,10 +95,9 @@ npm version <patch|minor|major>
 npm publish
 ```
 
-`prepublishOnly` rebuilds `dist/` before the package is published, and
-`publishConfig.access` is set to `public` so the scoped package is published
-publicly. The published tarball ships `dist/`, the TypeScript source, the
-README, and the license; examples and build config are excluded.
+`prepublishOnly` rebuilds `dist/` before the package is published. The
+published tarball ships `dist/`, the TypeScript source, the README, and the
+license; examples and build config are excluded.
 
 Verify the contents of a release without publishing:
 
@@ -106,8 +105,7 @@ Verify the contents of a release without publishing:
 npm pack --dry-run
 ```
 
-Publishing requires npm auth with rights to the `@ksb` scope. KSB is MIT
-licensed and intended as public ecosystem infrastructure.
+KSB is MIT licensed and intended as public ecosystem infrastructure.
 
 ## Next SDK work
 

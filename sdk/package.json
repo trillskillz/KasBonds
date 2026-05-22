@@ -1,5 +1,5 @@
 {
-  "name": "@ksb/sdk",
+  "name": "ksb-sdk",
   "version": "0.1.0",
   "description": "TypeScript SDK for the Kaspa Service Bond Protocol (KSB)",
   "license": "MIT",

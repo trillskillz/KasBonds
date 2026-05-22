@@ -34,10 +34,10 @@ Implemented now:
 - custom verifier registration (app-owned signed webhooks)
 - ERC-8004 aligned party reputation profiles
 - initial OpenAPI spec
-- publish-ready `@ksb/sdk` package
+- `ksb-sdk` package published to npm
 
 Still in progress:
-- publishing `@ksb/sdk` to npm
+- Phase 7 reputation layer
 
 See also:
 - `STATUS.md`

@@ -60,4 +60,4 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Continue Phase 7: pin the reputation payload against the published ERC-8004 schema and add verifier-role reputation, then publish `@ksb/sdk` to npm.
+Continue Phase 7: pin the reputation payload against the published ERC-8004 schema and add verifier-role reputation.
