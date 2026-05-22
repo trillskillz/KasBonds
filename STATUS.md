@@ -51,6 +51,7 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - published the SDK to npm as `ksb-sdk@0.1.0` (the `@ksb` scope was unavailable, so the package is unscoped), verified with a clean install and ESM import
 - started Phase 7 (reputation): added an ERC-8004 aligned reputation profile that re-shapes a party's KSB history into validation-registry vocabulary (a release is a pass, a slash is a fail), exposed at `GET /api/v1/parties/:addr/reputation`
 - extended the reputation profile with a `verifierActivity` facet (schema version 0.2): the profile now covers a party both as the subject of validations and as a performer of validations, with overall and per-app verifier counts
+- added a party reputation lookup panel to the operator console: an address lookup that renders the reputation score, summary stats, verifier activity, per-app signals, and recent validations from `GET /api/v1/parties/:addr/reputation`
 
 ## Current blockers
 - one early test lock is still stuck under an obsolete low-fee contract variant
@@ -62,4 +63,4 @@ Phases 1 through 6 are in place: the TN12 covenant proof, the canonical KSB sche
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Continue Phase 7: pin the reputation payload field names against the published ERC-8004 schema, then add public reputation lookup to the operator console (Task 7.3 UI surface).
+Close out Phase 7 by pinning the reputation payload field names against the published ERC-8004 schema, then begin Phase 8 reference integrations.

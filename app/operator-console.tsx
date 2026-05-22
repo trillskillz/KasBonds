@@ -104,6 +104,33 @@ interface Filters {
   limit: string;
 }
 
+interface ReputationProfile {
+  schema: string;
+  schemaVersion: string;
+  subject: { account: string; address: string; registry: string; validationPattern: string };
+  summary: {
+    totalValidations: number;
+    passed: number;
+    failed: number;
+    pending: number;
+    passRate: number | null;
+    reputationScore: number | null;
+    activeRiskIndicator: number;
+    stakeBondedSompi: string;
+    stakeSlashedSompi: string;
+  };
+  signals: Array<{ appId: string; appName: string | null; validations: number; passed: number; failed: number; passRate: number | null }>;
+  recentValidations: Array<{ bondPublicId: string; appId: string; role: string; outcome: string; bondAmountSompi: string; createdAt: string }>;
+  verifierActivity: {
+    validationsServed: number;
+    appsServed: number;
+    bondedValueObservedSompi: string;
+    perApp: Array<{ appId: string; appName: string | null; validationsServed: number; bondedValueObservedSompi: string }>;
+  };
+  compatibility: { standard: string; registryRole: string; status: string };
+  generatedAt: string;
+}
+
 const stateBadgeColors: Record<string, string> = {
   draft: 'rgba(255,255,255,0.18)',
   offered: 'rgba(255,255,255,0.18)',
@@ -199,6 +226,162 @@ function actionButtonStyle(enabled: boolean): CSSProperties {
     opacity: enabled ? 1 : 0.45,
     cursor: enabled ? 'pointer' : 'not-allowed',
   };
+}
+
+function reputationScoreColor(score: number | null): string {
+  if (score == null) {
+    return 'rgba(245,247,251,0.5)';
+  }
+  if (score >= 80) {
+    return '#9de3a0';
+  }
+  if (score >= 50) {
+    return '#ffcf8b';
+  }
+  return '#ffb3b3';
+}
+
+function outcomeColor(outcome: string): string {
+  if (outcome === 'released') {
+    return '#9de3a0';
+  }
+  if (outcome === 'slashed') {
+    return '#ffb3b3';
+  }
+  return 'rgba(245,247,251,0.6)';
+}
+
+function ReputationPanel() {
+  const [address, setAddress] = useState('');
+  const [profile, setProfile] = useState<ReputationProfile | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function lookup() {
+    const addr = address.trim();
+    if (!addr) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setProfile(null);
+
+    try {
+      const response = await fetch(`/api/v1/parties/${encodeURIComponent(addr)}/reputation`, { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? 'Reputation lookup failed');
+      }
+      setProfile(data as ReputationProfile);
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : 'Reputation lookup failed');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const summary = profile?.summary;
+
+  return (
+    <div style={{ ...sectionCardStyle(), marginBottom: 24 }}>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#ff4d4d', marginBottom: 8 }}>Party reputation</div>
+        <div style={{ color: 'rgba(245,247,251,0.78)', fontSize: 14 }}>
+          Look up the ERC-8004 aligned reputation profile for any party address. A release is a pass, a slash is a fail.
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, marginBottom: error || profile ? 16 : 0 }}>
+        <input
+          style={inputStyle}
+          value={address}
+          onChange={(event) => setAddress(event.target.value)}
+          onKeyDown={(event) => { if (event.key === 'Enter') void lookup(); }}
+          placeholder="kaspa:provider-agent"
+        />
+        <button disabled={loading || !address.trim()} onClick={() => void lookup()} style={actionButtonStyle(!loading && Boolean(address.trim()))}>
+          {loading ? 'Looking up...' : 'Look up'}
+        </button>
+      </div>
+
+      {error ? <div style={{ padding: 14, borderRadius: 14, background: 'rgba(255,77,77,0.12)', border: '1px solid rgba(255,77,77,0.28)', color: '#ffb3b3', fontSize: 14 }}>{error}</div> : null}
+
+      {profile && summary ? (
+        <div style={{ display: 'grid', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ padding: '14px 20px', borderRadius: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(245,247,251,0.56)', marginBottom: 6 }}>Reputation score</div>
+              <div style={{ fontSize: 40, fontWeight: 800, lineHeight: 1, color: reputationScoreColor(summary.reputationScore) }}>
+                {summary.reputationScore ?? 'n/a'}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'rgba(245,247,251,0.78)' }}>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', color: '#f5f7fb', wordBreak: 'break-word' }}>{profile.subject.account}</div>
+              <div>{profile.compatibility.standard} - {profile.compatibility.registryRole} registry, {profile.compatibility.status}</div>
+              <div>schema {profile.schema} v{profile.schemaVersion}</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12 }}>
+            {[
+              ['Validations', String(summary.totalValidations)],
+              ['Passed', String(summary.passed)],
+              ['Failed', String(summary.failed)],
+              ['Pending', String(summary.pending)],
+              ['Pass rate', summary.passRate == null ? 'n/a' : `${Math.round(summary.passRate * 100)}%`],
+              ['Active risk', `${Math.round(summary.activeRiskIndicator * 100)}%`],
+              ['Stake bonded', formatSompi(summary.stakeBondedSompi)],
+              ['Stake slashed', formatSompi(summary.stakeSlashedSompi)],
+            ].map(([label, value]) => (
+              <div key={label} style={{ padding: 12, borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(245,247,251,0.56)', marginBottom: 6 }}>{label}</div>
+                <div style={{ fontSize: 15 }}>{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ padding: 14, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#ff4d4d', marginBottom: 8 }}>Verifier activity</div>
+            <div style={{ fontSize: 14, color: 'rgba(245,247,251,0.82)' }}>
+              Served <strong>{profile.verifierActivity.validationsServed}</strong> validation(s) across <strong>{profile.verifierActivity.appsServed}</strong> app(s); bond value observed {formatSompi(profile.verifierActivity.bondedValueObservedSompi)}.
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#ff4d4d', marginBottom: 8 }}>Per-app signals</div>
+            <div style={{ display: 'grid', gap: 8 }}>
+              {profile.signals.length === 0 ? (
+                <div style={{ color: 'rgba(245,247,251,0.58)', fontSize: 14 }}>No per-app validation history.</div>
+              ) : profile.signals.map((signal) => (
+                <div key={signal.appId} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', fontSize: 13 }}>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{signal.appName ?? signal.appId}</span>
+                  <span style={{ color: 'rgba(245,247,251,0.78)' }}>
+                    {signal.passed} passed / {signal.failed} failed{signal.passRate == null ? '' : ` - ${Math.round(signal.passRate * 100)}%`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#ff4d4d', marginBottom: 8 }}>Recent validations</div>
+            <div style={{ display: 'grid', gap: 8 }}>
+              {profile.recentValidations.length === 0 ? (
+                <div style={{ color: 'rgba(245,247,251,0.58)', fontSize: 14 }}>No bond participation recorded for this address.</div>
+              ) : profile.recentValidations.slice(0, 8).map((record) => (
+                <div key={`${record.role}:${record.bondPublicId}`} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', fontSize: 13 }}>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{record.bondPublicId}</span>
+                  <span style={{ color: 'rgba(245,247,251,0.7)' }}>{record.role} - {formatSompi(record.bondAmountSompi)}</span>
+                  <span style={{ color: outcomeColor(record.outcome), textTransform: 'uppercase', fontSize: 12, letterSpacing: '0.06em' }}>{record.outcome}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export default function OperatorConsole() {
@@ -521,6 +704,8 @@ export default function OperatorConsole() {
           </div>
         </div>
       </div>
+
+      <ReputationPanel />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 380px) minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
         <section style={{ borderRadius: 24, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.025)', overflow: 'hidden' }}>
