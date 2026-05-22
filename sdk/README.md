@@ -1,17 +1,28 @@
 # @ksb/sdk
 
-Initial SDK skeleton for the Kaspa Service Bonds protocol.
+Initial SDK for the Kaspa Service Bonds protocol.
 
 ## Current scope
 
-This first pass provides:
+This pass provides:
 - typed request/response interfaces
 - a small `KsbClient` wrapper around the current `/api/v1` HTTP surface
 - app-authenticated and operator-authenticated request helpers
+- a local TypeScript build layout
+- a quickstart example under `examples/quickstart.ts`
 
-It is intentionally thin. The goal is to make protocol gaps obvious before the SDK is polished.
+It is still intentionally thin. The goal is to stabilize the protocol surface before polishing ergonomics.
 
-## Example
+## Build
+
+```bash
+cd sdk
+npm install
+npm run typecheck
+npm run build
+```
+
+## Quickstart
 
 ```ts
 import { KsbClient } from '@ksb/sdk';
@@ -29,7 +40,7 @@ const bond = await client.createBond({
   deadlineUnix: Math.floor(Date.now() / 1000) + 3600,
   verifierConfigJson: {
     verifierAddress: 'kaspa:verifier...',
-    rules: [{ name: 'http-check' }],
+    rules: [{ name: 'http-check', verifierAddress: 'kaspa:verifier...' }],
   },
   slashDistributionJson: {
     provider: 0.7,
@@ -39,12 +50,15 @@ const bond = await client.createBond({
 });
 
 const status = await client.getBondStatus(bond.bond.publicId);
+console.log(status.status);
 ```
+
+For a fuller flow including operator-side app bootstrap, see `examples/quickstart.ts`.
 
 ## Next SDK work
 
-- package/build layout
-- generated or validated types from OpenAPI
+- spec-to-code validation against `docs/openapi/ksb-v1.openapi.yaml`
+- publishing workflow
 - richer auth helpers
 - signing helpers for release/slash execution payloads
-- examples directory and quickstart
+- more launch-grade examples

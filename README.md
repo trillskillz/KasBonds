@@ -119,6 +119,10 @@ Protocol artifacts:
 - OpenAPI: `docs/openapi/ksb-v1.openapi.yaml`
 - SDK skeleton: `sdk/`
 
+SDK helpers:
+- `npm run sdk:typecheck`
+- `npm run sdk:build`
+
 ## Notes
 
 - The repo is mid-transition from an earlier BondClaw proof app into a cleaner KSB protocol reference implementation.

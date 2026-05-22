@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "sdk:build": "npm --prefix sdk run build",
+    "sdk:typecheck": "npm --prefix sdk run typecheck",
     "db:apply": "node scripts/apply-schema.mjs",
     "check:env": "node scripts/check-env.mjs",
     "check:rpc": "node scripts/check-rpc.mjs",

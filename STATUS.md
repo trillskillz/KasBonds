@@ -53,4 +53,4 @@ Phase 1 complete. Reframing the project under the Kaspa Service Bond Protocol pl
 - the verifier queue is still derived client-side from the general list, not backed by dedicated server-side review queries or assignment logic
 
 ## Immediate next move
-Turn the SDK skeleton into a publishable package with examples and tighter spec-to-code alignment.
+Tighten spec-to-code alignment and add more than one launch-grade SDK example before publishing.
