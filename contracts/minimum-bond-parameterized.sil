@@ -1,0 +1,44 @@
+pragma silverscript ^0.1.0;
+
+contract MinimumBondParameterized(
+    pubkey oracleKey,
+    pubkey slashKey,
+    pubkey agentKey,
+    pubkey buyerKey,
+    pubkey platformFeeKey,
+    pubkey burnKey,
+    int deadline,
+    int minerFee
+) {
+    entrypoint function release(sig oracleSig) {
+        require(checkSig(oracleSig, oracleKey));
+        require(tx.outputs.length == 1);
+
+        int currentValue = tx.inputs[this.activeInputIndex].value;
+        int releaseAmount = currentValue - minerFee;
+
+        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(agentKey)));
+        require(tx.outputs[0].value == releaseAmount);
+    }
+
+    entrypoint function slash(sig slashSig) {
+        require(checkSig(slashSig, slashKey));
+        require(tx.time >= deadline);
+        require(tx.outputs.length == 3);
+
+        int currentValue = tx.inputs[this.activeInputIndex].value;
+        int distributable = currentValue - minerFee;
+        int buyerAmount = distributable * 50 / 100;
+        int platformFeeAmount = distributable * 5 / 100;
+        int burnAmount = distributable - buyerAmount - platformFeeAmount;
+
+        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(buyerKey)));
+        require(tx.outputs[0].value == buyerAmount);
+
+        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(platformFeeKey)));
+        require(tx.outputs[1].value == platformFeeAmount);
+
+        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(burnKey)));
+        require(tx.outputs[2].value == burnAmount);
+    }
+}

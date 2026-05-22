@@ -1,0 +1,2239 @@
+{
+  "contract_name": "MinimumBond",
+  "compiler_version": "0.1.0",
+  "script": [
+    107,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    118,
+    32,
+    70,
+    109,
+    127,
+    202,
+    229,
+    99,
+    229,
+    203,
+    9,
+    160,
+    209,
+    135,
+    11,
+    181,
+    128,
+    52,
+    72,
+    4,
+    97,
+    120,
+    121,
+    161,
+    73,
+    73,
+    207,
+    34,
+    40,
+    95,
+    27,
+    174,
+    63,
+    39,
+    172,
+    105,
+    180,
+    81,
+    156,
+    105,
+    0,
+    195,
+    32,
+    44,
+    11,
+    124,
+    249,
+    83,
+    36,
+    160,
+    125,
+    5,
+    57,
+    139,
+    36,
+    1,
+    116,
+    220,
+    12,
+    43,
+    228,
+    68,
+    217,
+    107,
+    21,
+    154,
+    166,
+    199,
+    247,
+    177,
+    230,
+    104,
+    104,
+    9,
+    145,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    0,
+    194,
+    185,
+    190,
+    3,
+    224,
+    147,
+    4,
+    148,
+    156,
+    105,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    118,
+    32,
+    60,
+    114,
+    173,
+    219,
+    79,
+    223,
+    9,
+    175,
+    148,
+    240,
+    201,
+    77,
+    127,
+    233,
+    42,
+    56,
+    106,
+    126,
+    112,
+    207,
+    138,
+    29,
+    133,
+    145,
+    99,
+    134,
+    187,
+    37,
+    53,
+    199,
+    177,
+    177,
+    172,
+    105,
+    4,
+    0,
+    241,
+    83,
+    101,
+    176,
+    180,
+    83,
+    156,
+    105,
+    185,
+    190,
+    3,
+    224,
+    147,
+    4,
+    148,
+    118,
+    1,
+    50,
+    149,
+    1,
+    100,
+    150,
+    120,
+    85,
+    149,
+    1,
+    100,
+    150,
+    0,
+    195,
+    32,
+    154,
+    194,
+    3,
+    53,
+    235,
+    56,
+    118,
+    141,
+    32,
+    82,
+    190,
+    29,
+    187,
+    195,
+    200,
+    246,
+    23,
+    132,
+    7,
+    69,
+    142,
+    81,
+    230,
+    180,
+    173,
+    34,
+    241,
+    217,
+    23,
+    88,
+    137,
+    91,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    0,
+    194,
+    82,
+    121,
+    156,
+    105,
+    81,
+    195,
+    32,
+    90,
+    180,
+    104,
+    158,
+    64,
+    10,
+    74,
+    22,
+    12,
+    240,
+    28,
+    212,
+    71,
+    48,
+    132,
+    90,
+    84,
+    118,
+    141,
+    248,
+    84,
+    125,
+    205,
+    240,
+    115,
+    217,
+    100,
+    241,
+    9,
+    241,
+    140,
+    48,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    81,
+    194,
+    120,
+    156,
+    105,
+    82,
+    195,
+    32,
+    121,
+    98,
+    212,
+    91,
+    56,
+    232,
+    188,
+    248,
+    47,
+    168,
+    239,
+    168,
+    67,
+    42,
+    1,
+    242,
+    12,
+    154,
+    83,
+    226,
+    76,
+    125,
+    63,
+    17,
+    223,
+    25,
+    124,
+    184,
+    231,
+    9,
+    38,
+    218,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    82,
+    194,
+    83,
+    121,
+    83,
+    121,
+    148,
+    82,
+    121,
+    148,
+    156,
+    105,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104
+  ],
+  "ast": {
+    "pragma": {
+      "name": "silverscript",
+      "value": "^0.1.0",
+      "span": "pragma silverscript ^0.1.0;",
+      "name_span": "silverscript",
+      "value_span": "^0.1.0"
+    },
+    "name": "MinimumBond",
+    "params": [],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "ORACLE_KEY",
+        "expr": {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 70,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 109,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 127,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 202,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 229,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 99,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 229,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 203,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 9,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 160,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 209,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 135,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 11,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 181,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 128,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 52,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 72,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 4,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 97,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 120,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 121,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 161,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 73,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 73,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 207,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 34,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 40,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 95,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 27,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 174,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 63,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            },
+            {
+              "kind": "byte",
+              "data": 39,
+              "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+            }
+          ],
+          "span": "0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27"
+        },
+        "span": "pubkey constant ORACLE_KEY = 0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27;",
+        "type_span": "pubkey ",
+        "name_span": "ORACLE_KEY"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "SLASH_KEY",
+        "expr": {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 60,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 114,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 173,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 219,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 79,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 223,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 9,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 175,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 148,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 240,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 201,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 77,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 127,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 233,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 42,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 56,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 106,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 126,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 112,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 207,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 138,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 29,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 133,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 145,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 99,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 134,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 187,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 37,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 53,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 199,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 177,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            },
+            {
+              "kind": "byte",
+              "data": 177,
+              "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+            }
+          ],
+          "span": "0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1"
+        },
+        "span": "pubkey constant SLASH_KEY = 0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1;",
+        "type_span": "pubkey ",
+        "name_span": "SLASH_KEY"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "AGENT_KEY",
+        "expr": {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 44,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 11,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 124,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 249,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 83,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 36,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 160,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 125,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 5,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 57,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 139,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 36,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 1,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 116,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 220,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 12,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 43,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 228,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 68,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 217,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 107,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 21,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 154,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 166,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 199,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 247,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 177,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 230,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 104,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 104,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 9,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            },
+            {
+              "kind": "byte",
+              "data": 145,
+              "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+            }
+          ],
+          "span": "0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991"
+        },
+        "span": "pubkey constant AGENT_KEY = 0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991;",
+        "type_span": "pubkey ",
+        "name_span": "AGENT_KEY"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "BUYER_KEY",
+        "expr": {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 154,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 194,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 3,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 53,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 235,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 56,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 118,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 141,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 32,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 82,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 190,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 29,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 187,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 195,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 200,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 246,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 23,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 132,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 7,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 69,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 142,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 81,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 230,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 180,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 173,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 34,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 241,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 217,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 23,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 88,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 137,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            },
+            {
+              "kind": "byte",
+              "data": 91,
+              "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+            }
+          ],
+          "span": "0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b"
+        },
+        "span": "pubkey constant BUYER_KEY = 0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b;",
+        "type_span": "pubkey ",
+        "name_span": "BUYER_KEY"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "PLATFORM_FEE_KEY",
+        "expr": {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 90,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 180,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 104,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 158,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 64,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 10,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 74,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 22,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 12,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 240,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 28,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 212,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 71,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 48,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 132,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 90,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 84,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 118,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 141,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 248,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 84,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 125,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 205,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 240,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 115,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 217,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 100,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 241,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 9,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 241,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 140,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            },
+            {
+              "kind": "byte",
+              "data": 48,
+              "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+            }
+          ],
+          "span": "0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30"
+        },
+        "span": "pubkey constant PLATFORM_FEE_KEY = 0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30;",
+        "type_span": "pubkey ",
+        "name_span": "PLATFORM_FEE_KEY"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "BURN_KEY",
+        "expr": {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 121,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 98,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 212,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 91,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 56,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 232,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 188,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 248,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 47,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 168,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 239,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 168,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 67,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 42,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 1,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 242,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 12,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 154,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 83,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 226,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 76,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 125,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 63,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 17,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 223,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 25,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 124,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 184,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 231,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 9,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 38,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            },
+            {
+              "kind": "byte",
+              "data": 218,
+              "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+            }
+          ],
+          "span": "0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da"
+        },
+        "span": "pubkey constant BURN_KEY = 0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da;",
+        "type_span": "pubkey ",
+        "name_span": "BURN_KEY"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "DEADLINE",
+        "expr": {
+          "kind": "int",
+          "data": 1700000000,
+          "span": "1700000000"
+        },
+        "span": "int constant DEADLINE = 1700000000;",
+        "type_span": "int ",
+        "name_span": "DEADLINE"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 300000,
+          "span": "300000"
+        },
+        "span": "int constant MINER_FEE = 300000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "release",
+        "params": [
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "oracleSig",
+            "span": "sig oracleSig",
+            "type_span": "sig ",
+            "name_span": "oracleSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "returns_tuple": false,
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "oracleSig",
+                      "span": "oracleSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "ORACLE_KEY",
+                      "span": "ORACLE_KEY"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(oracleSig, ORACLE_KEY)"
+              },
+              "message": null,
+              "span": "require(checkSig(oracleSig, ORACLE_KEY));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "nullary",
+                    "data": "tx_outputs_length",
+                    "span": "tx.outputs.length"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 1,
+                    "span": "1"
+                  }
+                },
+                "span": "tx.outputs.length == 1"
+              },
+              "message": null,
+              "span": "require(tx.outputs.length == 1);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "currentValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int currentValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "currentValue"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "releaseAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "currentValue",
+                    "span": "currentValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "MINER_FEE",
+                    "span": "MINER_FEE"
+                  }
+                },
+                "span": "currentValue - MINER_FEE"
+              },
+              "span": "int releaseAmount = currentValue - MINER_FEE;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "releaseAmount"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "AGENT_KEY",
+                                "span": "AGENT_KEY"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(AGENT_KEY)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(AGENT_KEY))"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(AGENT_KEY))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(AGENT_KEY)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "releaseAmount",
+                    "span": "releaseAmount"
+                  }
+                },
+                "span": "tx.outputs[0].value == releaseAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value == releaseAmount);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function release(sig oracleSig) {\n        require(checkSig(oracleSig, ORACLE_KEY));\n        require(tx.outputs.length == 1);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int releaseAmount = currentValue - MINER_FEE;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(AGENT_KEY)));\n        require(tx.outputs[0].value == releaseAmount);\n    }",
+        "name_span": "release",
+        "body_span": "require(checkSig(oracleSig, ORACLE_KEY));\n        require(tx.outputs.length == 1);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int releaseAmount = currentValue - MINER_FEE;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(AGENT_KEY)));\n        require(tx.outputs[0].value == releaseAmount);"
+      },
+      {
+        "name": "slash",
+        "params": [
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "slashSig",
+            "span": "sig slashSig",
+            "type_span": "sig ",
+            "name_span": "slashSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "returns_tuple": false,
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "slashSig",
+                      "span": "slashSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "SLASH_KEY",
+                      "span": "SLASH_KEY"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(slashSig, SLASH_KEY)"
+              },
+              "message": null,
+              "span": "require(checkSig(slashSig, SLASH_KEY));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "time_op",
+            "data": {
+              "tx_var": "tx_time",
+              "expr": {
+                "kind": "identifier",
+                "data": "DEADLINE",
+                "span": "DEADLINE"
+              },
+              "message": null,
+              "span": "require(tx.time >= DEADLINE);",
+              "tx_var_span": "tx.time",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "nullary",
+                    "data": "tx_outputs_length",
+                    "span": "tx.outputs.length"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 3,
+                    "span": "3"
+                  }
+                },
+                "span": "tx.outputs.length == 3"
+              },
+              "message": null,
+              "span": "require(tx.outputs.length == 3);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "currentValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int currentValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "currentValue"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "distributable",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "currentValue",
+                    "span": "currentValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "MINER_FEE",
+                    "span": "MINER_FEE"
+                  }
+                },
+                "span": "currentValue - MINER_FEE"
+              },
+              "span": "int distributable = currentValue - MINER_FEE;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "distributable"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "buyerAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "div",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "distributable",
+                        "span": "distributable"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "data": 50,
+                        "span": "50 "
+                      }
+                    },
+                    "span": "distributable * 50 "
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 100,
+                    "span": "100"
+                  }
+                },
+                "span": "distributable * 50 / 100"
+              },
+              "span": "int buyerAmount = distributable * 50 / 100;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "buyerAmount"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "platformFeeAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "div",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "distributable",
+                        "span": "distributable"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "data": 5,
+                        "span": "5 "
+                      }
+                    },
+                    "span": "distributable * 5 "
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 100,
+                    "span": "100"
+                  }
+                },
+                "span": "distributable * 5 / 100"
+              },
+              "span": "int platformFeeAmount = distributable * 5 / 100;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "platformFeeAmount"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "burnAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "distributable",
+                        "span": "distributable"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "buyerAmount",
+                        "span": "buyerAmount"
+                      }
+                    },
+                    "span": "distributable - buyerAmount"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "platformFeeAmount",
+                    "span": "platformFeeAmount"
+                  }
+                },
+                "span": "distributable - buyerAmount - platformFeeAmount"
+              },
+              "span": "int burnAmount = distributable - buyerAmount - platformFeeAmount;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "burnAmount"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "BUYER_KEY",
+                                "span": "BUYER_KEY"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(BUYER_KEY)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(BUYER_KEY))"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(BUYER_KEY))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(BUYER_KEY)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "buyerAmount",
+                    "span": "buyerAmount"
+                  }
+                },
+                "span": "tx.outputs[0].value == buyerAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value == buyerAmount);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 1,
+                        "span": "1"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[1].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "PLATFORM_FEE_KEY",
+                                "span": "PLATFORM_FEE_KEY"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(PLATFORM_FEE_KEY)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(PLATFORM_FEE_KEY))"
+                  }
+                },
+                "span": "tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(PLATFORM_FEE_KEY))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(PLATFORM_FEE_KEY)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 1,
+                        "span": "1"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[1].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "platformFeeAmount",
+                    "span": "platformFeeAmount"
+                  }
+                },
+                "span": "tx.outputs[1].value == platformFeeAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[1].value == platformFeeAmount);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 2,
+                        "span": "2"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[2].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "BURN_KEY",
+                                "span": "BURN_KEY"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(BURN_KEY)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(BURN_KEY))"
+                  }
+                },
+                "span": "tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(BURN_KEY))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(BURN_KEY)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 2,
+                        "span": "2"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[2].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "burnAmount",
+                    "span": "burnAmount"
+                  }
+                },
+                "span": "tx.outputs[2].value == burnAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[2].value == burnAmount);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function slash(sig slashSig) {\n        require(checkSig(slashSig, SLASH_KEY));\n        require(tx.time >= DEADLINE);\n        require(tx.outputs.length == 3);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int distributable = currentValue - MINER_FEE;\n        int buyerAmount = distributable * 50 / 100;\n        int platformFeeAmount = distributable * 5 / 100;\n        int burnAmount = distributable - buyerAmount - platformFeeAmount;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(BUYER_KEY)));\n        require(tx.outputs[0].value == buyerAmount);\n\n        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(PLATFORM_FEE_KEY)));\n        require(tx.outputs[1].value == platformFeeAmount);\n\n        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(BURN_KEY)));\n        require(tx.outputs[2].value == burnAmount);\n    }",
+        "name_span": "slash",
+        "body_span": "require(checkSig(slashSig, SLASH_KEY));\n        require(tx.time >= DEADLINE);\n        require(tx.outputs.length == 3);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int distributable = currentValue - MINER_FEE;\n        int buyerAmount = distributable * 50 / 100;\n        int platformFeeAmount = distributable * 5 / 100;\n        int burnAmount = distributable - buyerAmount - platformFeeAmount;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(BUYER_KEY)));\n        require(tx.outputs[0].value == buyerAmount);\n\n        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(PLATFORM_FEE_KEY)));\n        require(tx.outputs[1].value == platformFeeAmount);\n\n        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(BURN_KEY)));\n        require(tx.outputs[2].value == burnAmount);"
+      }
+    ],
+    "span": "contract MinimumBond() {\n    pubkey constant ORACLE_KEY = 0x466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27;\n    pubkey constant SLASH_KEY = 0x3c72addb4fdf09af94f0c94d7fe92a386a7e70cf8a1d85916386bb2535c7b1b1;\n    pubkey constant AGENT_KEY = 0x2c0b7cf95324a07d05398b240174dc0c2be444d96b159aa6c7f7b1e668680991;\n    pubkey constant BUYER_KEY = 0x9ac20335eb38768d2052be1dbbc3c8f6178407458e51e6b4ad22f1d91758895b;\n    pubkey constant PLATFORM_FEE_KEY = 0x5ab4689e400a4a160cf01cd44730845a54768df8547dcdf073d964f109f18c30;\n    pubkey constant BURN_KEY = 0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da;\n    int constant DEADLINE = 1700000000;\n    int constant MINER_FEE = 300000;\n\n    entrypoint function release(sig oracleSig) {\n        require(checkSig(oracleSig, ORACLE_KEY));\n        require(tx.outputs.length == 1);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int releaseAmount = currentValue - MINER_FEE;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(AGENT_KEY)));\n        require(tx.outputs[0].value == releaseAmount);\n    }\n\n    entrypoint function slash(sig slashSig) {\n        require(checkSig(slashSig, SLASH_KEY));\n        require(tx.time >= DEADLINE);\n        require(tx.outputs.length == 3);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int distributable = currentValue - MINER_FEE;\n        int buyerAmount = distributable * 50 / 100;\n        int platformFeeAmount = distributable * 5 / 100;\n        int burnAmount = distributable - buyerAmount - platformFeeAmount;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(BUYER_KEY)));\n        require(tx.outputs[0].value == buyerAmount);\n\n        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(PLATFORM_FEE_KEY)));\n        require(tx.outputs[1].value == platformFeeAmount);\n\n        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(BURN_KEY)));\n        require(tx.outputs[2].value == burnAmount);\n    }\n}",
+    "name_span": "MinimumBond"
+  },
+  "abi": [
+    {
+      "name": "release",
+      "inputs": [
+        {
+          "name": "oracleSig",
+          "type_name": "sig"
+        }
+      ]
+    },
+    {
+      "name": "slash",
+      "inputs": [
+        {
+          "name": "slashSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "state_layout": {
+    "start": 1,
+    "len": 0
+  },
+  "debug_info": null
+}

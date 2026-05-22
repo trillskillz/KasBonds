@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+.turbo/
+wallets.json
+.kascov-console-history
+tx-history.jsonl
+test/deployment-real.json
+*.bak

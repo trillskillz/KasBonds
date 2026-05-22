@@ -1,0 +1,25 @@
+{
+  "name": "x402-kaspa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "x402 payment protocol for Kaspa L1 — covenant-based micropayments",
+  "scripts": {
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@types/websocket": "^1.0.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@noble/hashes": "1.3.2",
+    "websocket": "^1.0.35"
+  }
+}

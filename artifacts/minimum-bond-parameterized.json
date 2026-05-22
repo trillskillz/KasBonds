@@ -1,0 +1,1233 @@
+{
+  "contract_name": "MinimumBondParameterized",
+  "compiler_version": "0.1.0",
+  "script": [
+    107,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    118,
+    32,
+    70,
+    109,
+    127,
+    202,
+    229,
+    99,
+    229,
+    203,
+    9,
+    160,
+    209,
+    135,
+    11,
+    181,
+    128,
+    52,
+    72,
+    4,
+    97,
+    120,
+    121,
+    161,
+    73,
+    73,
+    207,
+    34,
+    40,
+    95,
+    27,
+    174,
+    63,
+    39,
+    172,
+    105,
+    180,
+    81,
+    156,
+    105,
+    0,
+    195,
+    32,
+    44,
+    11,
+    124,
+    249,
+    83,
+    36,
+    160,
+    125,
+    5,
+    57,
+    139,
+    36,
+    1,
+    116,
+    220,
+    12,
+    43,
+    228,
+    68,
+    217,
+    107,
+    21,
+    154,
+    166,
+    199,
+    247,
+    177,
+    230,
+    104,
+    104,
+    9,
+    145,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    0,
+    194,
+    185,
+    190,
+    3,
+    224,
+    147,
+    4,
+    148,
+    156,
+    105,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    118,
+    32,
+    60,
+    114,
+    173,
+    219,
+    79,
+    223,
+    9,
+    175,
+    148,
+    240,
+    201,
+    77,
+    127,
+    233,
+    42,
+    56,
+    106,
+    126,
+    112,
+    207,
+    138,
+    29,
+    133,
+    145,
+    99,
+    134,
+    187,
+    37,
+    53,
+    199,
+    177,
+    177,
+    172,
+    105,
+    4,
+    0,
+    241,
+    83,
+    101,
+    176,
+    180,
+    83,
+    156,
+    105,
+    185,
+    190,
+    3,
+    224,
+    147,
+    4,
+    148,
+    118,
+    1,
+    50,
+    149,
+    1,
+    100,
+    150,
+    120,
+    85,
+    149,
+    1,
+    100,
+    150,
+    0,
+    195,
+    32,
+    154,
+    194,
+    3,
+    53,
+    235,
+    56,
+    118,
+    141,
+    32,
+    82,
+    190,
+    29,
+    187,
+    195,
+    200,
+    246,
+    23,
+    132,
+    7,
+    69,
+    142,
+    81,
+    230,
+    180,
+    173,
+    34,
+    241,
+    217,
+    23,
+    88,
+    137,
+    91,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    0,
+    194,
+    82,
+    121,
+    156,
+    105,
+    81,
+    195,
+    32,
+    90,
+    180,
+    104,
+    158,
+    64,
+    10,
+    74,
+    22,
+    12,
+    240,
+    28,
+    212,
+    71,
+    48,
+    132,
+    90,
+    84,
+    118,
+    141,
+    248,
+    84,
+    125,
+    205,
+    240,
+    115,
+    217,
+    100,
+    241,
+    9,
+    241,
+    140,
+    48,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    81,
+    194,
+    120,
+    156,
+    105,
+    82,
+    195,
+    32,
+    121,
+    98,
+    212,
+    91,
+    56,
+    232,
+    188,
+    248,
+    47,
+    168,
+    239,
+    168,
+    67,
+    42,
+    1,
+    242,
+    12,
+    154,
+    83,
+    226,
+    76,
+    125,
+    63,
+    17,
+    223,
+    25,
+    124,
+    184,
+    231,
+    9,
+    38,
+    218,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    82,
+    194,
+    83,
+    121,
+    83,
+    121,
+    148,
+    82,
+    121,
+    148,
+    156,
+    105,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104
+  ],
+  "ast": {
+    "pragma": {
+      "name": "silverscript",
+      "value": "^0.1.0",
+      "span": "pragma silverscript ^0.1.0;",
+      "name_span": "silverscript",
+      "value_span": "^0.1.0"
+    },
+    "name": "MinimumBondParameterized",
+    "params": [
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "oracleKey",
+        "span": "pubkey oracleKey",
+        "type_span": "pubkey ",
+        "name_span": "oracleKey"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "slashKey",
+        "span": "pubkey slashKey",
+        "type_span": "pubkey ",
+        "name_span": "slashKey"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "agentKey",
+        "span": "pubkey agentKey",
+        "type_span": "pubkey ",
+        "name_span": "agentKey"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "buyerKey",
+        "span": "pubkey buyerKey",
+        "type_span": "pubkey ",
+        "name_span": "buyerKey"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "platformFeeKey",
+        "span": "pubkey platformFeeKey",
+        "type_span": "pubkey ",
+        "name_span": "platformFeeKey"
+      },
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "burnKey",
+        "span": "pubkey burnKey",
+        "type_span": "pubkey ",
+        "name_span": "burnKey"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "deadline",
+        "span": "int deadline",
+        "type_span": "int ",
+        "name_span": "deadline"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "minerFee",
+        "span": "int minerFee",
+        "type_span": "int ",
+        "name_span": "minerFee"
+      }
+    ],
+    "constants": [],
+    "functions": [
+      {
+        "name": "release",
+        "params": [
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "oracleSig",
+            "span": "sig oracleSig",
+            "type_span": "sig ",
+            "name_span": "oracleSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "returns_tuple": false,
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "oracleSig",
+                      "span": "oracleSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "oracleKey",
+                      "span": "oracleKey"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(oracleSig, oracleKey)"
+              },
+              "message": null,
+              "span": "require(checkSig(oracleSig, oracleKey));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "nullary",
+                    "data": "tx_outputs_length",
+                    "span": "tx.outputs.length"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 1,
+                    "span": "1"
+                  }
+                },
+                "span": "tx.outputs.length == 1"
+              },
+              "message": null,
+              "span": "require(tx.outputs.length == 1);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "currentValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int currentValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "currentValue"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "releaseAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "currentValue",
+                    "span": "currentValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "minerFee",
+                    "span": "minerFee"
+                  }
+                },
+                "span": "currentValue - minerFee"
+              },
+              "span": "int releaseAmount = currentValue - minerFee;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "releaseAmount"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "agentKey",
+                                "span": "agentKey"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(agentKey)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(agentKey))"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(agentKey))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(agentKey)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "releaseAmount",
+                    "span": "releaseAmount"
+                  }
+                },
+                "span": "tx.outputs[0].value == releaseAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value == releaseAmount);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function release(sig oracleSig) {\n        require(checkSig(oracleSig, oracleKey));\n        require(tx.outputs.length == 1);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int releaseAmount = currentValue - minerFee;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(agentKey)));\n        require(tx.outputs[0].value == releaseAmount);\n    }",
+        "name_span": "release",
+        "body_span": "require(checkSig(oracleSig, oracleKey));\n        require(tx.outputs.length == 1);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int releaseAmount = currentValue - minerFee;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(agentKey)));\n        require(tx.outputs[0].value == releaseAmount);"
+      },
+      {
+        "name": "slash",
+        "params": [
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "slashSig",
+            "span": "sig slashSig",
+            "type_span": "sig ",
+            "name_span": "slashSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "returns_tuple": false,
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "slashSig",
+                      "span": "slashSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "slashKey",
+                      "span": "slashKey"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(slashSig, slashKey)"
+              },
+              "message": null,
+              "span": "require(checkSig(slashSig, slashKey));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "time_op",
+            "data": {
+              "tx_var": "tx_time",
+              "expr": {
+                "kind": "identifier",
+                "data": "deadline",
+                "span": "deadline"
+              },
+              "message": null,
+              "span": "require(tx.time >= deadline);",
+              "tx_var_span": "tx.time",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "nullary",
+                    "data": "tx_outputs_length",
+                    "span": "tx.outputs.length"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 3,
+                    "span": "3"
+                  }
+                },
+                "span": "tx.outputs.length == 3"
+              },
+              "message": null,
+              "span": "require(tx.outputs.length == 3);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "currentValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int currentValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "currentValue"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "distributable",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "currentValue",
+                    "span": "currentValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "minerFee",
+                    "span": "minerFee"
+                  }
+                },
+                "span": "currentValue - minerFee"
+              },
+              "span": "int distributable = currentValue - minerFee;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "distributable"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "buyerAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "div",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "distributable",
+                        "span": "distributable"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "data": 50,
+                        "span": "50 "
+                      }
+                    },
+                    "span": "distributable * 50 "
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 100,
+                    "span": "100"
+                  }
+                },
+                "span": "distributable * 50 / 100"
+              },
+              "span": "int buyerAmount = distributable * 50 / 100;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "buyerAmount"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "platformFeeAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "div",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "distributable",
+                        "span": "distributable"
+                      },
+                      "right": {
+                        "kind": "int",
+                        "data": 5,
+                        "span": "5 "
+                      }
+                    },
+                    "span": "distributable * 5 "
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 100,
+                    "span": "100"
+                  }
+                },
+                "span": "distributable * 5 / 100"
+              },
+              "span": "int platformFeeAmount = distributable * 5 / 100;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "platformFeeAmount"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "burnAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "distributable",
+                        "span": "distributable"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "buyerAmount",
+                        "span": "buyerAmount"
+                      }
+                    },
+                    "span": "distributable - buyerAmount"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "platformFeeAmount",
+                    "span": "platformFeeAmount"
+                  }
+                },
+                "span": "distributable - buyerAmount - platformFeeAmount"
+              },
+              "span": "int burnAmount = distributable - buyerAmount - platformFeeAmount;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "burnAmount"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "buyerKey",
+                                "span": "buyerKey"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(buyerKey)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(buyerKey))"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(buyerKey))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(buyerKey)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "buyerAmount",
+                    "span": "buyerAmount"
+                  }
+                },
+                "span": "tx.outputs[0].value == buyerAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value == buyerAmount);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 1,
+                        "span": "1"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[1].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "platformFeeKey",
+                                "span": "platformFeeKey"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(platformFeeKey)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(platformFeeKey))"
+                  }
+                },
+                "span": "tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(platformFeeKey))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(platformFeeKey)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 1,
+                        "span": "1"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[1].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "platformFeeAmount",
+                    "span": "platformFeeAmount"
+                  }
+                },
+                "span": "tx.outputs[1].value == platformFeeAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[1].value == platformFeeAmount);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 2,
+                        "span": "2"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[2].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "call",
+                    "data": {
+                      "name": "byte[]",
+                      "args": [
+                        {
+                          "kind": "new",
+                          "data": {
+                            "name": "ScriptPubKeyP2PK",
+                            "args": [
+                              {
+                                "kind": "identifier",
+                                "data": "burnKey",
+                                "span": "burnKey"
+                              }
+                            ],
+                            "name_span": "ScriptPubKeyP2PK"
+                          },
+                          "span": "new ScriptPubKeyP2PK(burnKey)"
+                        }
+                      ],
+                      "name_span": "byte[]"
+                    },
+                    "span": "byte[](new ScriptPubKeyP2PK(burnKey))"
+                  }
+                },
+                "span": "tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(burnKey))"
+              },
+              "message": null,
+              "span": "require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(burnKey)));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 2,
+                        "span": "2"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[2].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "burnAmount",
+                    "span": "burnAmount"
+                  }
+                },
+                "span": "tx.outputs[2].value == burnAmount"
+              },
+              "message": null,
+              "span": "require(tx.outputs[2].value == burnAmount);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function slash(sig slashSig) {\n        require(checkSig(slashSig, slashKey));\n        require(tx.time >= deadline);\n        require(tx.outputs.length == 3);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int distributable = currentValue - minerFee;\n        int buyerAmount = distributable * 50 / 100;\n        int platformFeeAmount = distributable * 5 / 100;\n        int burnAmount = distributable - buyerAmount - platformFeeAmount;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(buyerKey)));\n        require(tx.outputs[0].value == buyerAmount);\n\n        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(platformFeeKey)));\n        require(tx.outputs[1].value == platformFeeAmount);\n\n        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(burnKey)));\n        require(tx.outputs[2].value == burnAmount);\n    }",
+        "name_span": "slash",
+        "body_span": "require(checkSig(slashSig, slashKey));\n        require(tx.time >= deadline);\n        require(tx.outputs.length == 3);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int distributable = currentValue - minerFee;\n        int buyerAmount = distributable * 50 / 100;\n        int platformFeeAmount = distributable * 5 / 100;\n        int burnAmount = distributable - buyerAmount - platformFeeAmount;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(buyerKey)));\n        require(tx.outputs[0].value == buyerAmount);\n\n        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(platformFeeKey)));\n        require(tx.outputs[1].value == platformFeeAmount);\n\n        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(burnKey)));\n        require(tx.outputs[2].value == burnAmount);"
+      }
+    ],
+    "span": "contract MinimumBondParameterized(\n    pubkey oracleKey,\n    pubkey slashKey,\n    pubkey agentKey,\n    pubkey buyerKey,\n    pubkey platformFeeKey,\n    pubkey burnKey,\n    int deadline,\n    int minerFee\n) {\n    entrypoint function release(sig oracleSig) {\n        require(checkSig(oracleSig, oracleKey));\n        require(tx.outputs.length == 1);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int releaseAmount = currentValue - minerFee;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(agentKey)));\n        require(tx.outputs[0].value == releaseAmount);\n    }\n\n    entrypoint function slash(sig slashSig) {\n        require(checkSig(slashSig, slashKey));\n        require(tx.time >= deadline);\n        require(tx.outputs.length == 3);\n\n        int currentValue = tx.inputs[this.activeInputIndex].value;\n        int distributable = currentValue - minerFee;\n        int buyerAmount = distributable * 50 / 100;\n        int platformFeeAmount = distributable * 5 / 100;\n        int burnAmount = distributable - buyerAmount - platformFeeAmount;\n\n        require(tx.outputs[0].scriptPubKey == byte[](new ScriptPubKeyP2PK(buyerKey)));\n        require(tx.outputs[0].value == buyerAmount);\n\n        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(platformFeeKey)));\n        require(tx.outputs[1].value == platformFeeAmount);\n\n        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(burnKey)));\n        require(tx.outputs[2].value == burnAmount);\n    }\n}",
+    "name_span": "MinimumBondParameterized"
+  },
+  "abi": [
+    {
+      "name": "release",
+      "inputs": [
+        {
+          "name": "oracleSig",
+          "type_name": "sig"
+        }
+      ]
+    },
+    {
+      "name": "slash",
+      "inputs": [
+        {
+          "name": "slashSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "state_layout": {
+    "start": 1,
+    "len": 0
+  },
+  "debug_info": null
+}

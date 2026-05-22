@@ -1,0 +1,35 @@
+{
+  "name": "@kaspacom/x402-kaspa",
+  "version": "0.1.0",
+  "description": "x402 Kaspa client SDK — automatic HTTP 402 payments on Kaspa L1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kaspacom/x402-types": "workspace:*",
+    "@kaspacom/x402-covenant": "workspace:*",
+    "@kaspacom/x402-wasm": "workspace:*"
+  },
+  "author": "KaspaCom",
+  "license": "MIT",
+  "keywords": ["kaspa", "x402", "micropayments", "http-402", "payment-channel", "sdk", "client"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KASPACOM/x402-KAS.git",
+    "directory": "packages/client"
+  }
+}

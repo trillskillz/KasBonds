@@ -1,0 +1,34 @@
+{
+  "name": "@kaspacom/x402-covenant",
+  "version": "0.1.0",
+  "description": "Covenant utilities for x402 Kaspa — deploy, sign, settle payment channels",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kaspacom/x402-types": "workspace:*",
+    "@kaspacom/x402-wasm": "workspace:*"
+  },
+  "author": "KaspaCom",
+  "license": "MIT",
+  "keywords": ["kaspa", "x402", "covenant", "smart-contract", "payment-channel"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KASPACOM/x402-KAS.git",
+    "directory": "packages/covenant"
+  }
+}

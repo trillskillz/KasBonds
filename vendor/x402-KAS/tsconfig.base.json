@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@kaspacom/x402-types": ["packages/types/src/index.ts"],
+      "@kaspacom/x402-covenant": ["packages/covenant/src/index.ts"],
+      "@kaspacom/x402-kaspa": ["packages/client/src/index.ts"],
+      "@kaspacom/x402-wasm": ["packages/kaspa-wasm/kaspa.js"]
+    }
+  }
+}

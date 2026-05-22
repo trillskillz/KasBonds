@@ -1,0 +1,40 @@
+{
+  "name": "bondclaw",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:apply": "node scripts/apply-schema.mjs",
+    "check:env": "node scripts/check-env.mjs",
+    "check:rpc": "node scripts/check-rpc.mjs",
+    "wallet:info": "node scripts/wallet-info.mjs",
+    "covenant:address": "node scripts/covenant-address.mjs",
+    "bond:lock": "node scripts/lock-bond.mjs",
+    "keygen": "node scripts/generate-key.mjs",
+    "ctor:args": "node scripts/generate-constructor-args.mjs",
+    "debug:compile:legacy": "node scripts/compile-legacy.mjs",
+    "compile:covenant": "node scripts/compile-parameterized.mjs release",
+    "compile:covenant:param": "npm run compile:covenant",
+    "compile:covenant:release": "node scripts/compile-parameterized.mjs release",
+    "compile:covenant:slash": "node scripts/compile-parameterized.mjs slash",
+    "proof:plan": "node scripts/proof-plan.mjs",
+    "proof:release": "npm run compile:covenant:release && node scripts/release-proof.mjs",
+    "proof:slash": "npm run compile:covenant:slash && node scripts/slash-proof.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "next": "15.3.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "typescript": "^5.8.3"
+  }
+}
