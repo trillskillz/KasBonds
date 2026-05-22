@@ -18,6 +18,7 @@ Current routes:
 - `GET /api/v1/parties/:addr/score`
 - `POST /api/v1/cron/resolve-expired`
 - `POST /api/v1/cron/auto-verify`
+- `POST /api/v1/cron/rebuild-party-history`
 
 Every route:
 - exports `export const dynamic = 'force-dynamic'`
@@ -186,6 +187,8 @@ Notes:
 - this first slice prefers useful public history over perfect completeness
 - verifier role totals come from `ksb_party_history`
 - recent bond activity is derived from canonical `ksb_bonds`
+- provider and counterparty bonded totals are now maintained at bond creation time
+- verifier participation is heuristically inferred from known verifier/oracle address fields in `verifierConfigJson`
 
 ### `GET /api/v1/parties/:addr/score`
 Reads a public reputation-style score view for an address.
@@ -229,6 +232,15 @@ Behavior:
   - otherwise `active`
 - appends a resolver event when a status changes
 - intended to be idempotent through no-op status checks
+
+### `POST /api/v1/cron/rebuild-party-history`
+Maintenance route that rebuilds `ksb_party_history` from canonical KSB tables.
+
+Behavior:
+- clears current `ksb_party_history`
+- replays canonical bond participation from `ksb_bonds`
+- reapplies terminal release/slash totals from canonical status plus `ksb_slashing_events`
+- useful after schema changes or for reconciling older rows
 
 ### `GET /api/v1/bonds/:bondId/status`
 Reads a lighter-weight status polling view for a canonical KSB bond.

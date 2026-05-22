@@ -78,6 +78,40 @@ function parseJsonObject(value: string | null | undefined, fieldName: string) {
   return parsed as Record<string, unknown>;
 }
 
+function collectVerifierAddresses(value: unknown, acc = new Set<string>()) {
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      collectVerifierAddresses(entry, acc);
+    }
+    return acc;
+  }
+
+  if (!value || typeof value !== 'object') {
+    return acc;
+  }
+
+  const record = value as Record<string, unknown>;
+  const addressKeys = new Set(['verifierAddress', 'verifierAddresses', 'oracleAddress', 'oracleAddresses']);
+
+  for (const [key, entry] of Object.entries(record)) {
+    if (addressKeys.has(key)) {
+      if (typeof entry === 'string' && entry.trim()) {
+        acc.add(entry.trim());
+      } else if (Array.isArray(entry)) {
+        for (const item of entry) {
+          if (typeof item === 'string' && item.trim()) {
+            acc.add(item.trim());
+          }
+        }
+      }
+    }
+
+    collectVerifierAddresses(entry, acc);
+  }
+
+  return acc;
+}
+
 function normalizeRuleSetFromVerifierConfig(verifierConfigJson: string) {
   const parsed = parseJsonObject(verifierConfigJson, 'verifierConfigJson');
   const rawRules = Array.isArray(parsed.rules)
@@ -310,6 +344,40 @@ async function upsertKsbPartyResolution(
   }
 }
 
+async function upsertKsbPartyBondedAmount(
+  db: any,
+  bond: Pick<KsbBondRecord, 'appId' | 'providerAddress' | 'counterpartyAddress' | 'bondAmountSompi' | 'verifierConfigJson'>,
+) {
+  const parsedVerifierConfig = parseJsonObject(bond.verifierConfigJson, 'verifierConfigJson');
+  const verifierAddresses = Array.from(collectVerifierAddresses(parsedVerifierConfig));
+  const participants = [
+    { address: bond.providerAddress, role: 'provider' as const },
+    { address: bond.counterpartyAddress, role: 'counterparty' as const },
+    ...verifierAddresses.map((address) => ({ address, role: 'verifier' as const })),
+  ];
+
+  for (const entry of participants) {
+    await (db as any).$client.execute({
+      sql: `
+        INSERT INTO ksb_party_history (
+          address, app_id, role, total_bonded_sompi, bonds_released, bonds_slashed, total_slashed_value_sompi
+        ) VALUES (
+          :address, :appId, :role, :bondAmountSompi, 0, 0, '0'
+        )
+        ON CONFLICT(address, app_id, role) DO UPDATE SET
+          total_bonded_sompi = CAST(CAST(ksb_party_history.total_bonded_sompi AS INTEGER) + CAST(:bondAmountSompi AS INTEGER) AS TEXT),
+          last_updated = CURRENT_TIMESTAMP
+      `,
+      args: {
+        address: entry.address,
+        appId: bond.appId,
+        role: entry.role,
+        bondAmountSompi: bond.bondAmountSompi,
+      },
+    });
+  }
+}
+
 export async function registerApp(db: any, input: RegisterAppInput): Promise<RegisteredAppSecret> {
   const normalizedName = input.name?.trim();
   if (!normalizedName) {
@@ -494,6 +562,14 @@ export async function createKsbBond(db: any, appId: string, input: CreateKsbBond
     'KSB bond proposed',
     JSON.stringify({ useCaseTemplate, externalRef: input.externalRef ?? null }),
   );
+
+  await upsertKsbPartyBondedAmount(db, {
+    appId,
+    providerAddress,
+    counterpartyAddress,
+    bondAmountSompi: bondAmountSompi!,
+    verifierConfigJson,
+  });
 
   return getKsbBondDetail(db, publicId);
 }
@@ -1181,6 +1257,48 @@ export async function autoVerifyKsbBonds(db: any): Promise<KsbCronRunResult> {
     scanned: bondsResult.rows.length,
     updated: bondIds.length,
     bondIds,
+    at: new Date().toISOString(),
+  };
+}
+
+export async function rebuildKsbPartyHistory(db: any): Promise<KsbCronRunResult> {
+  const bondsResult = await (db as any).$client.execute({
+    sql: `
+      SELECT b.*, s.slash_amount_sompi
+      FROM ksb_bonds b
+      LEFT JOIN ksb_slashing_events s ON s.bond_id = b.id
+      ORDER BY b.created_at ASC
+      LIMIT 1000
+    `,
+    args: {},
+  });
+
+  await (db as any).$client.execute({
+    sql: `DELETE FROM ksb_party_history`,
+    args: {},
+  });
+
+  for (const row of bondsResult.rows) {
+    const bond = rowToBond(row);
+    await upsertKsbPartyBondedAmount(db, bond);
+
+    if (bond.status === 'released') {
+      await upsertKsbPartyResolution(db, bond, 'released');
+    } else if (bond.status === 'slashed') {
+      await upsertKsbPartyResolution(
+        db,
+        bond,
+        'slashed',
+        row.slash_amount_sompi ? String(row.slash_amount_sompi) : bond.bondAmountSompi,
+      );
+    }
+  }
+
+  return {
+    action: 'rebuild-party-history',
+    scanned: bondsResult.rows.length,
+    updated: bondsResult.rows.length,
+    bondIds: bondsResult.rows.map((row: any) => String(row.public_id)),
     at: new Date().toISOString(),
   };
 }

@@ -250,7 +250,7 @@ export interface KsbPartyScoreView {
 }
 
 export interface KsbCronRunResult {
-  action: 'resolve-expired' | 'auto-verify';
+  action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history';
   scanned: number;
   updated: number;
   bondIds: string[];
