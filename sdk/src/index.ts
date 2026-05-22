@@ -50,7 +50,7 @@ export interface CreateKsbBondInput {
   bondAmountSompi: string;
   paymentAmountSompi?: string | null;
   deadlineUnix: number;
-  verifierConfigJson: JsonValue;
+  verifierConfigJson: JsonValue | KsbVerifierConfig;
   slashDistributionJson: JsonValue;
   externalRef?: string | null;
   covenantScriptVersion?: string | null;
@@ -275,6 +275,32 @@ export interface KsbCronRunResult {
   updated: number;
   bondIds: string[];
   at: string;
+}
+
+export interface KsbVerifierRuleRef {
+  name: string;
+  verifierType?: string;
+  description?: string;
+  params?: Record<string, JsonValue>;
+}
+
+/**
+ * A composable verifier rule set. A leaf references one rule; a group combines
+ * children with an `AND` or `OR` operator. Place a node under the `ruleSet`
+ * key of `verifierConfigJson`, or use a flat `rules` array for an implicit AND.
+ */
+export type KsbRuleSetNode =
+  | KsbVerifierRuleRef
+  | { op: 'AND' | 'OR'; children: KsbRuleSetNode[] };
+
+/**
+ * Verifier configuration for a bond. Provide either a composed `ruleSet` tree
+ * or a flat `rules` array (treated as an implicit AND). Any other JSON-shaped
+ * config is also accepted by `verifierConfigJson`.
+ */
+export interface KsbVerifierConfig {
+  ruleSet?: KsbRuleSetNode;
+  rules?: KsbRuleSetNode[];
 }
 
 export interface DispatchVerifierRuleInput {

@@ -54,6 +54,45 @@ Execution-signature verification currently requires:
 - optional `KSB_OPERATOR_SIGNER_ID` to pin the expected signer identity
 - optional `KSB_EXECUTION_SIGNATURE_MAX_AGE_SECONDS` (defaults to `900`)
 
+## Verifier rule sets
+
+A bond `verifierConfigJson` describes how its verifier rules combine into one
+pass or fail outcome. Two shapes are accepted.
+
+Flat, treated as an implicit AND of every rule:
+
+```json
+{ "rules": [ { "name": "http_status_check", "params": { "url": "https://..." } } ] }
+```
+
+Composed tree, with explicit AND or OR groups:
+
+```json
+{
+  "ruleSet": {
+    "op": "AND",
+    "children": [
+      { "name": "http_content_check", "params": { "mustContain": ["CVE-"] } },
+      { "op": "OR", "children": [
+        { "name": "signature_check" },
+        { "name": "external_oracle_check", "params": { "oracleUrl": "https://..." } }
+      ] }
+    ]
+  }
+}
+```
+
+Status evaluation walks the tree against the per-rule results in
+`ksb_verifications`:
+- an AND group passes only when every child passes
+- an OR group passes when any child passes
+- a `contested` result on any rule contests the whole bond
+- rules recorded but absent from the tree (for example rules added by a proof
+  submission) are ANDed onto the configured tree
+
+Proof submission, hub dispatch, and the auto-verify cron all use this same
+evaluation, so a flat config and a composed config stay consistent.
+
 ## Route details
 
 ### `POST /api/v1/apps/register`
@@ -138,11 +177,11 @@ Request body:
   - `verifierSignature` optional string
 
 Behavior:
-- reads rules from `verifierConfigJson.rules` when present
+- reads rules from the `verifierConfigJson` rule set, flat or composed
 - allows submitted rules to extend the configured set
 - upserts `ksb_verifier_rules` placeholders for referenced rules
 - creates or updates `ksb_verifications`
-- moves bond status to one of:
+- derives bond status by evaluating the rule set tree, moving status to one of:
   - `active`
   - `verified`
   - `failed`
@@ -168,7 +207,7 @@ Behavior:
 - executes each built-in rule through the verifier hub
 - rules missing required runtime inputs resolve to `pending`
 - upserts `ksb_verifications` rows with `verifier_signature` set to `ksb-hub`
-- recomputes bond status from the full verification set
+- recomputes bond status by evaluating the rule set tree
 
 Returns:
 - `bond` full bond detail
@@ -311,12 +350,7 @@ Authentication:
 Behavior:
 - scans canonical bonds with active or recently derived statuses
 - reads `ksb_verifications`
-- applies this precedence:
-  - `contested`
-  - `failed`
-  - `timed_out`
-  - `verified` when all rows passed
-  - otherwise `active`
+- derives status by evaluating the bond rule set tree against the recorded results
 - appends a resolver event when a status changes
 - intended to be idempotent through no-op status checks
 

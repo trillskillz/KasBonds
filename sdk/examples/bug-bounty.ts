@@ -2,9 +2,10 @@
  * Bug bounty escrow bond.
  *
  * A sponsor stakes a bond against a bounty payout. A researcher submits a
- * proof of the finding. Verification combines two built-in rules: a
- * `signature_check` proving the researcher authored the report, and an
- * `http_content_check` confirming the disclosure write-up is published.
+ * proof of the finding. Verification uses a composed rule set: the disclosure
+ * write-up must be published (`http_content_check`) AND the finding must be
+ * attested either by the researcher's signature (`signature_check`) OR by an
+ * external triage oracle (`external_oracle_check`).
  *
  * This example also shows the contest path: if the sponsor disputes the
  * verified outcome the bond moves to arbitration instead of release.
@@ -14,7 +15,7 @@
  *   KSB_OPERATOR_API_KEY=... \
  *   node --experimental-strip-types examples/bug-bounty.ts
  */
-import { KsbClient } from '../src/index';
+import { KsbClient, type KsbRuleSetNode } from '../src/index';
 
 const baseUrl = process.env.KSB_BASE_URL ?? 'http://localhost:3000';
 const operatorKey = process.env.KSB_OPERATOR_API_KEY;
@@ -30,6 +31,26 @@ async function main() {
 
   const appClient = new KsbClient({ baseUrl, apiKey: app.apiKey, operatorKey });
 
+  // Composed rule set: a published write-up AND (researcher signature OR
+  // triage oracle). Either attestation path satisfies the OR branch.
+  const ruleSet: KsbRuleSetNode = {
+    op: 'AND',
+    children: [
+      {
+        name: 'http_content_check',
+        verifierType: 'content',
+        params: { mustContain: ['CVE-', 'reproduction steps'] },
+      },
+      {
+        op: 'OR',
+        children: [
+          { name: 'signature_check', verifierType: 'signature', params: { algorithm: 'ed25519' } },
+          { name: 'external_oracle_check', verifierType: 'oracle', params: { oracleUrl: 'https://triage.example.com/verdict' } },
+        ],
+      },
+    ],
+  };
+
   // The sponsor escrows the bounty as a bond.
   const created = await appClient.createBond({
     useCaseTemplate: 'bug_bounty',
@@ -37,20 +58,7 @@ async function main() {
     counterpartyAddress: 'kaspa:researcher',
     bondAmountSompi: '2000000000',
     deadlineUnix: Math.floor(Date.now() / 1000) + 7 * 24 * 3600,
-    verifierConfigJson: {
-      rules: [
-        {
-          name: 'signature_check',
-          verifierType: 'signature',
-          params: { algorithm: 'ed25519' },
-        },
-        {
-          name: 'http_content_check',
-          verifierType: 'content',
-          params: { mustContain: ['CVE-', 'reproduction steps'] },
-        },
-      ],
-    },
+    verifierConfigJson: { ruleSet },
     slashDistributionJson: {
       counterparty_compensation: 0.9,
       burn: 0.055,

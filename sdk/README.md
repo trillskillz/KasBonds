@@ -64,7 +64,7 @@ console.log(status.status);
 The `examples/` directory holds runnable end-to-end flows:
 - `quickstart.ts` - operator app bootstrap, bond creation, status read
 - `agent-sla.ts` - agent-to-agent SLA bond verified by `http_status_check`
-- `bug-bounty.ts` - bug bounty escrow with `signature_check` plus `http_content_check`, including the contest path
+- `bug-bounty.ts` - bug bounty escrow with a composed `AND`/`OR` rule set, including the contest path
 
 Built-in rule names referenced by the examples come from the protocol catalog
 returned by `GET /api/v1/verifier-rules`.

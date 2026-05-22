@@ -30,11 +30,12 @@ Implemented now:
 - verifier rule listing
 - built-in verifier rule catalog (http, content, time, signature, oracle)
 - verifier hub dispatch (protocol-computed rule execution)
+- composable AND/OR verifier rule sets
 - initial OpenAPI spec
 - initial SDK skeleton
 
 Still in progress:
-- composable rule sets and custom verifier registration
+- custom verifier registration
 - SDK packaging and npm publishing
 
 See also:

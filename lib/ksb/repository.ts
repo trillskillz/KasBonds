@@ -26,6 +26,7 @@ import type {
 } from './types';
 import { BUILT_IN_VERIFIER_RULES, isBuiltInVerifierRule } from './verifier-rules';
 import { executeVerifierRule } from './verifier-hub';
+import { collectRuleSpecs, evaluateBondStatus, parseRuleSetConfig, type RuleSpec } from './rule-sets';
 
 function makeAppId() {
   return `app_${randomUUID().replace(/-/g, '').slice(0, 16)}`;
@@ -140,48 +141,6 @@ function extractVerifierAddresses(verifierConfigJson: string) {
   }
 
   return Array.from(acc);
-}
-
-function normalizeRuleSetFromVerifierConfig(verifierConfigJson: string) {
-  const parsed = parseJsonObject(verifierConfigJson, 'verifierConfigJson');
-  const rawRules = Array.isArray(parsed.rules)
-    ? parsed.rules
-    : Array.isArray(parsed.verifications)
-      ? parsed.verifications
-      : [];
-
-  return rawRules
-    .map((entry) => {
-      if (typeof entry === 'string') {
-        return { ruleName: entry, verifierType: 'custom', description: 'Rule declared in verifierConfigJson', schemaJson: '{}' };
-      }
-
-      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-        return null;
-      }
-
-      const ruleName = typeof entry.name === 'string'
-        ? entry.name
-        : typeof entry.ruleName === 'string'
-          ? entry.ruleName
-          : null;
-
-      if (!ruleName) {
-        return null;
-      }
-
-      const description = typeof entry.description === 'string' ? entry.description : 'Rule declared in verifierConfigJson';
-      const verifierType = typeof entry.verifierType === 'string' ? entry.verifierType : 'custom';
-      const schemaValue = entry.schema && typeof entry.schema === 'object' && !Array.isArray(entry.schema) ? entry.schema : {};
-
-      return {
-        ruleName,
-        verifierType,
-        description,
-        schemaJson: JSON.stringify(schemaValue),
-      };
-    })
-    .filter((entry): entry is { ruleName: string; verifierType: string; description: string; schemaJson: string } => Boolean(entry));
 }
 
 function normalizeEvidenceInput(value: string | Record<string, unknown> | null | undefined) {
@@ -734,73 +693,8 @@ export async function listKsbVerifierRules(db: any): Promise<KsbVerifierRuleReco
   return [...BUILT_IN_VERIFIER_RULES, ...customRules].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function aggregateBondStatus(results: string[]): KsbBondStatus {
-  if (results.includes('contested')) return 'contested';
-  if (results.includes('failed')) return 'failed';
-  if (results.includes('timed_out')) return 'timed_out';
-  if (results.length > 0 && results.every((result) => result === 'passed')) return 'verified';
-  return 'active';
-}
-
-interface VerifierRuleSpec {
-  ruleName: string;
-  verifierType: string;
-  description: string;
-  schemaJson: string;
-  params: Record<string, unknown>;
-}
-
-function parseVerifierRuleSpecs(verifierConfigJson: string): VerifierRuleSpec[] {
-  const parsed = parseJsonObject(verifierConfigJson, 'verifierConfigJson');
-  const rawRules = Array.isArray(parsed.rules)
-    ? parsed.rules
-    : Array.isArray(parsed.verifications)
-      ? parsed.verifications
-      : [];
-
-  const specs: VerifierRuleSpec[] = [];
-  for (const entry of rawRules) {
-    if (typeof entry === 'string') {
-      const builtIn = BUILT_IN_VERIFIER_RULES.find((rule) => rule.name === entry);
-      specs.push({
-        ruleName: entry,
-        verifierType: builtIn?.verifierType ?? 'custom',
-        description: builtIn?.description ?? 'Rule declared in verifierConfigJson',
-        schemaJson: builtIn?.schemaJson ?? '{}',
-        params: {},
-      });
-      continue;
-    }
-
-    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-      continue;
-    }
-
-    const record = entry as Record<string, unknown>;
-    const ruleName = typeof record.name === 'string'
-      ? record.name
-      : typeof record.ruleName === 'string'
-        ? record.ruleName
-        : null;
-    if (!ruleName) {
-      continue;
-    }
-
-    const builtIn = BUILT_IN_VERIFIER_RULES.find((rule) => rule.name === ruleName);
-    const verifierType = typeof record.verifierType === 'string' ? record.verifierType : builtIn?.verifierType ?? 'custom';
-    const description = typeof record.description === 'string'
-      ? record.description
-      : builtIn?.description ?? 'Rule declared in verifierConfigJson';
-    const schemaJson = builtIn?.schemaJson
-      ?? (record.schema && typeof record.schema === 'object' && !Array.isArray(record.schema) ? JSON.stringify(record.schema) : '{}');
-    const params = record.params && typeof record.params === 'object' && !Array.isArray(record.params)
-      ? (record.params as Record<string, unknown>)
-      : {};
-
-    specs.push({ ruleName, verifierType, description, schemaJson, params });
-  }
-
-  return specs;
+function parseVerifierRuleSpecs(verifierConfigJson: string): RuleSpec[] {
+  return collectRuleSpecs(parseRuleSetConfig(verifierConfigJson));
 }
 
 /**
@@ -892,7 +786,11 @@ export async function dispatchKsbBondVerifications(
   }
 
   const refreshed = await getKsbBondDetail(db, bond.id);
-  const statusAfter = aggregateBondStatus(refreshed.verifications.map((verification) => verification.result));
+  const resultsByRule: Record<string, string> = {};
+  for (const verification of refreshed.verifications) {
+    resultsByRule[verification.ruleName] = verification.result;
+  }
+  const statusAfter = evaluateBondStatus(bond.verifierConfigJson, resultsByRule);
 
   if (statusAfter !== bond.status) {
     await (db as any).$client.execute({
@@ -1035,7 +933,7 @@ export async function submitKsbBondProof(db: any, idOrPublicId: string, input: S
     throw new Error(`Proof submission is not allowed from status ${bond.status}`);
   }
 
-  const configuredRules = normalizeRuleSetFromVerifierConfig(bond.verifierConfigJson);
+  const configuredRules = parseVerifierRuleSpecs(bond.verifierConfigJson);
   const submittedRules = (input.verifications ?? []).map((entry) => ({
     ruleName: entry.ruleName?.trim(),
     result: entry.result ?? 'pending',
@@ -1113,16 +1011,13 @@ export async function submitKsbBondProof(db: any, idOrPublicId: string, input: S
     });
   }
 
-  const allResults = Array.from(ruleMap.values()).map((rule) => submittedRules.find((entry) => entry.ruleName === rule.ruleName)?.result ?? detail.verifications.find((entry) => entry.ruleName === rule.ruleName)?.result ?? 'pending');
-  const nextStatus = allResults.includes('contested')
-    ? 'contested'
-    : allResults.includes('failed')
-      ? 'failed'
-      : allResults.includes('timed_out')
-        ? 'timed_out'
-        : allResults.every((result) => result === 'passed')
-          ? 'verified'
-          : 'active';
+  const resultsByRule: Record<string, string> = {};
+  for (const rule of ruleMap.values()) {
+    resultsByRule[rule.ruleName] = submittedRules.find((entry) => entry.ruleName === rule.ruleName)?.result
+      ?? detail.verifications.find((entry) => entry.ruleName === rule.ruleName)?.result
+      ?? 'pending';
+  }
+  const nextStatus = evaluateBondStatus(bond.verifierConfigJson, resultsByRule);
 
   await (db as any).$client.execute({
     sql: `UPDATE ksb_bonds SET status = :status WHERE id = :bondId`,
@@ -1575,7 +1470,7 @@ export async function resolveExpiredKsbBonds(db: any, nowUnix = Math.floor(Date.
 export async function autoVerifyKsbBonds(db: any): Promise<KsbCronRunResult> {
   const bondsResult = await (db as any).$client.execute({
     sql: `
-      SELECT id, public_id, status
+      SELECT id, public_id, status, verifier_config_json
       FROM ksb_bonds
       WHERE status IN ('proposed', 'committed', 'active', 'verified', 'failed', 'contested', 'timed_out')
       ORDER BY updated_at ASC
@@ -1591,24 +1486,20 @@ export async function autoVerifyKsbBonds(db: any): Promise<KsbCronRunResult> {
     const publicId = String(row.public_id);
     const currentStatus = String(row.status);
     const verificationsResult = await (db as any).$client.execute({
-      sql: `SELECT result FROM ksb_verifications WHERE bond_id = :bondId`,
+      sql: `SELECT rule_name, result FROM ksb_verifications WHERE bond_id = :bondId`,
       args: { bondId },
     });
 
-    const results = verificationsResult.rows.map((verificationRow: any) => String(verificationRow.result));
-    if (!results.length) {
+    if (!verificationsResult.rows.length) {
       continue;
     }
 
-    const nextStatus = results.includes('contested')
-      ? 'contested'
-      : results.includes('failed')
-        ? 'failed'
-        : results.includes('timed_out')
-          ? 'timed_out'
-          : results.every((entry: string) => entry === 'passed')
-            ? 'verified'
-            : 'active';
+    const resultsByRule: Record<string, string> = {};
+    for (const verificationRow of verificationsResult.rows) {
+      resultsByRule[String(verificationRow.rule_name)] = String(verificationRow.result);
+    }
+
+    const nextStatus = evaluateBondStatus(String(row.verifier_config_json), resultsByRule);
 
     if (nextStatus === currentStatus) {
       continue;

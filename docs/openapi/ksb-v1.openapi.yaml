@@ -93,7 +93,9 @@ components:
         paymentAmountSompi: { type: [string, 'null'] }
         deadlineUnix: { type: integer }
         verifierConfigJson:
-          $ref: '#/components/schemas/JsonValue'
+          oneOf:
+            - $ref: '#/components/schemas/KsbVerifierConfig'
+            - $ref: '#/components/schemas/JsonValue'
         slashDistributionJson:
           $ref: '#/components/schemas/JsonValue'
         externalRef: { type: [string, 'null'] }
@@ -424,6 +426,33 @@ components:
           type: array
           items: { $ref: '#/components/schemas/KsbVerifierRuleOutcome' }
       required: [bond, statusBefore, statusAfter, outcomes]
+    KsbRuleSetNode:
+      description: A composable verifier rule set node, either a leaf rule or an AND/OR group.
+      oneOf:
+        - type: object
+          description: Leaf rule reference.
+          properties:
+            name: { type: string }
+            verifierType: { type: string }
+            description: { type: string }
+            params: { type: object, additionalProperties: true }
+          required: [name]
+        - type: object
+          description: AND/OR group of child nodes.
+          properties:
+            op: { type: string, enum: [AND, OR] }
+            children:
+              type: array
+              items: { $ref: '#/components/schemas/KsbRuleSetNode' }
+          required: [op, children]
+    KsbVerifierConfig:
+      type: object
+      description: Verifier configuration. Provide a composed ruleSet tree or a flat rules array.
+      properties:
+        ruleSet: { $ref: '#/components/schemas/KsbRuleSetNode' }
+        rules:
+          type: array
+          items: { $ref: '#/components/schemas/KsbRuleSetNode' }
 paths:
   /api/v1/apps/register:
     post:
