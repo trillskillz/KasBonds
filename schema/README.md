@@ -62,6 +62,13 @@ Schema files are applied in numeric filename order.
 Current sequence:
 1. `001_phase2_initial.sql`
 2. `002_ksb_canonical.sql`
+3. `003_ksb_custom_verifiers.sql`
+
+`003_ksb_custom_verifiers.sql` adds `ksb_custom_verifiers`, which binds a named
+verifier rule to an app-owned signed webhook. The rule definition stays in
+`ksb_verifier_rules`; this table holds the owning `app_id`, the `webhook_url`,
+and an optional `verifier_public_key`. Every statement is idempotent so the
+file is safe to re-apply.
 
 ## Raw SQL note
 

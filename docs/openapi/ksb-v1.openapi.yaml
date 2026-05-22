@@ -453,6 +453,33 @@ components:
         rules:
           type: array
           items: { $ref: '#/components/schemas/KsbRuleSetNode' }
+    RegisterVerifierRuleInput:
+      type: object
+      properties:
+        name: { type: string }
+        webhookUrl: { type: string }
+        description: { type: [string, 'null'] }
+        verifierPublicKey: { type: [string, 'null'] }
+        defaultTimeoutMs: { type: [integer, 'null'] }
+        schemaJson:
+          oneOf:
+            - $ref: '#/components/schemas/JsonValue'
+            - type: 'null'
+      required: [name, webhookUrl]
+    RegisteredVerifierRule:
+      type: object
+      properties:
+        name: { type: string }
+        appId: { type: string }
+        description: { type: string }
+        verifierType: { type: string, enum: [webhook] }
+        webhookUrl: { type: string }
+        verifierPublicKey: { type: [string, 'null'] }
+        defaultTimeoutMs: { type: integer }
+        schemaJson: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [name, appId, description, verifierType, webhookUrl, verifierPublicKey, defaultTimeoutMs, schemaJson, createdAt, updatedAt]
 paths:
   /api/v1/apps/register:
     post:
@@ -800,6 +827,28 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/KsbVerifierRuleRecord' }
                 required: [rules]
+        default:
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    post:
+      summary: Register a custom verifier
+      description: App authenticated. Binds a named rule to an app-owned signed webhook.
+      security:
+        - AppApiKey: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterVerifierRuleInput' }
+      responses:
+        '201':
+          description: Registered verifier rule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RegisteredVerifierRule' }
         default:
           description: Error
           content:

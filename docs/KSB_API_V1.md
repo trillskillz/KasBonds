@@ -22,6 +22,7 @@ Current routes:
 - `POST /api/v1/cron/dispatch-verifiers`
 - `POST /api/v1/cron/rebuild-party-history`
 - `GET /api/v1/verifier-rules`
+- `POST /api/v1/verifier-rules`
 
 Every route:
 - exports `export const dynamic = 'force-dynamic'`
@@ -29,8 +30,9 @@ Every route:
 
 ## Current auth model
 
-### App-authenticated route
+### App-authenticated routes
 - `POST /api/v1/bonds`
+- `POST /api/v1/verifier-rules`
   - accepts `x-ksb-api-key: <api-key>` or `Authorization: Bearer <api-key>`
 
 ### Operator-authenticated routes
@@ -397,10 +399,34 @@ Each rule returns:
 - rule name
 - description
 - schema JSON snapshot
-- verifier type (`http`, `content`, `time`, `signature`, `oracle`, or `custom`)
+- verifier type (`http`, `content`, `time`, `signature`, `oracle`, `webhook`, or `custom`)
 - default timeout ms
 - created timestamp (`null` for built-in rules)
 - source (`builtin` or `custom`)
+
+### `POST /api/v1/verifier-rules`
+Registers a custom verifier: a named rule bound to an app-owned signed
+webhook. App authenticated.
+
+Request body:
+- `name` required, letters, digits, and underscores only, not a built-in rule name
+- `webhookUrl` required, absolute http or https URL
+- `verifierPublicKey` optional, PEM public key used to verify the signed verdict
+- `description` optional string
+- `defaultTimeoutMs` optional, capped at `120000`, defaults to `30000`
+- `schemaJson` optional object or JSON string
+
+Behavior:
+- a built-in rule name is reserved and cannot be registered
+- a rule already owned by another app cannot be reclaimed
+- upserts the rule definition in `ksb_verifier_rules` with verifier type `webhook`
+- upserts the webhook binding in `ksb_custom_verifiers`
+
+When the verifier hub dispatches a registered custom rule it POSTs the bond
+context and rule params to `webhookUrl`. The webhook must reply with a JSON
+body `{ "verdict": "pass" | "fail", "signature": "<hex or base64>" }`. When
+`verifierPublicKey` is set the signature over the verdict string is verified
+before the verdict is trusted.
 
 ### `GET /api/v1/bonds/:bondId/status`
 Reads a lighter-weight status polling view for a canonical KSB bond.

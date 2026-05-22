@@ -154,6 +154,67 @@ function executeSignatureCheck(params: Record<string, unknown>): VerifierRuleExe
   }
 }
 
+/**
+ * Call a webhook verifier that returns a signed `{ verdict, signature }`
+ * response. Shared by the built-in oracle rule and registered custom
+ * verifiers. When `publicKey` is set the signature over the verdict string is
+ * verified before the verdict is trusted.
+ */
+async function requestSignedVerdict(
+  config: { url: string; publicKey: string | null; timeoutMs: number; urlKey: string },
+  requestBody: Record<string, unknown>,
+): Promise<VerifierRuleExecution> {
+  const ev = (extra: Record<string, unknown>) => ({ [config.urlKey]: config.url, ...extra });
+
+  try {
+    const response = await fetch(config.url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(config.timeoutMs > 0 ? config.timeoutMs : 30000),
+    });
+    if (!response.ok) {
+      return { result: 'failed', evidence: ev({ error: `verifier returned status ${response.status}` }) };
+    }
+
+    const parsed = JSON.parse(await response.text()) as { verdict?: unknown; signature?: unknown };
+    const verdict = asString(parsed.verdict);
+    if (verdict !== 'pass' && verdict !== 'fail') {
+      return { result: 'failed', evidence: ev({ error: 'verifier verdict must be "pass" or "fail"' }) };
+    }
+
+    if (config.publicKey) {
+      const signature = asString(parsed.signature);
+      if (!signature) {
+        return { result: 'failed', evidence: ev({ error: 'verifier response is missing a signature' }) };
+      }
+      const signedOk = (() => {
+        try {
+          const key = createPublicKey(config.publicKey);
+          const signatureBytes = decodeSignatureBytes(signature);
+          const payload = Buffer.from(verdict);
+          return cryptoVerify(null, payload, key, signatureBytes) || cryptoVerify('sha256', payload, key, signatureBytes);
+        } catch {
+          return false;
+        }
+      })();
+      if (!signedOk) {
+        return { result: 'failed', evidence: ev({ error: 'verifier signature verification failed' }) };
+      }
+    }
+
+    return {
+      result: verdict === 'pass' ? 'passed' : 'failed',
+      evidence: ev({ verdict, signatureChecked: config.publicKey != null }),
+    };
+  } catch (error) {
+    if (isTimeoutError(error)) {
+      return { result: 'timed_out', evidence: ev({ error: 'verifier request timed out' }) };
+    }
+    return { result: 'failed', evidence: ev({ error: error instanceof Error ? error.message : 'verifier request failed' }) };
+  }
+}
+
 async function executeExternalOracleCheck(
   params: Record<string, unknown>,
   ruleName: string,
@@ -163,57 +224,25 @@ async function executeExternalOracleCheck(
     return { result: 'pending', evidence: { reason: 'missing oracleUrl param' } };
   }
 
-  const oraclePublicKey = asString(params.oraclePublicKey);
-  const query = params.query ?? {};
+  return requestSignedVerdict(
+    { url: oracleUrl, publicKey: asString(params.oraclePublicKey), timeoutMs: timeoutForRule(ruleName), urlKey: 'oracleUrl' },
+    { query: params.query ?? {} },
+  );
+}
 
-  try {
-    const response = await fetch(oracleUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ query }),
-      signal: AbortSignal.timeout(timeoutForRule(ruleName)),
-    });
-    if (!response.ok) {
-      return { result: 'failed', evidence: { oracleUrl, error: `oracle returned status ${response.status}` } };
-    }
-
-    const rawBody = await response.text();
-    const parsed = JSON.parse(rawBody) as { verdict?: unknown; signature?: unknown };
-    const verdict = asString(parsed.verdict);
-    if (verdict !== 'pass' && verdict !== 'fail') {
-      return { result: 'failed', evidence: { oracleUrl, error: 'oracle verdict must be "pass" or "fail"' } };
-    }
-
-    if (oraclePublicKey) {
-      const oracleSignature = asString(parsed.signature);
-      if (!oracleSignature) {
-        return { result: 'failed', evidence: { oracleUrl, error: 'oracle response is missing a signature' } };
-      }
-      const signedOk = (() => {
-        try {
-          const key = createPublicKey(oraclePublicKey);
-          const signatureBytes = decodeSignatureBytes(oracleSignature);
-          const payload = Buffer.from(verdict);
-          return cryptoVerify(null, payload, key, signatureBytes) || cryptoVerify('sha256', payload, key, signatureBytes);
-        } catch {
-          return false;
-        }
-      })();
-      if (!signedOk) {
-        return { result: 'failed', evidence: { oracleUrl, error: 'oracle signature verification failed' } };
-      }
-    }
-
-    return {
-      result: verdict === 'pass' ? 'passed' : 'failed',
-      evidence: { oracleUrl, verdict, signatureChecked: oraclePublicKey != null },
-    };
-  } catch (error) {
-    if (isTimeoutError(error)) {
-      return { result: 'timed_out', evidence: { oracleUrl, error: 'oracle request timed out' } };
-    }
-    return { result: 'failed', evidence: { oracleUrl, error: error instanceof Error ? error.message : 'oracle request failed' } };
-  }
+/**
+ * Execute a registered custom verifier by calling its bound webhook. The
+ * webhook receives the bond context and rule params and must reply with a
+ * signed `{ verdict, signature }` body.
+ */
+export async function executeWebhookVerifier(
+  config: { webhookUrl: string; verifierPublicKey: string | null; timeoutMs: number },
+  payload: Record<string, unknown>,
+): Promise<VerifierRuleExecution> {
+  return requestSignedVerdict(
+    { url: config.webhookUrl, publicKey: config.verifierPublicKey, timeoutMs: config.timeoutMs, urlKey: 'webhookUrl' },
+    payload,
+  );
 }
 
 /**

@@ -75,6 +75,13 @@ Typecheck every example against the SDK source:
 npm run examples:typecheck
 ```
 
+## Verifier rules
+
+`listVerifierRules()` returns the built-in protocol catalog merged with any
+app-registered custom rules. `registerVerifierRule()` (app authenticated)
+binds a named rule to an app-owned signed webhook that the verifier hub calls
+for a pass or fail verdict.
+
 ## Next SDK work
 
 - spec-to-code validation against `docs/openapi/ksb-v1.openapi.yaml`

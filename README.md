@@ -31,11 +31,11 @@ Implemented now:
 - built-in verifier rule catalog (http, content, time, signature, oracle)
 - verifier hub dispatch (protocol-computed rule execution)
 - composable AND/OR verifier rule sets
+- custom verifier registration (app-owned signed webhooks)
 - initial OpenAPI spec
 - initial SDK skeleton
 
 Still in progress:
-- custom verifier registration
 - SDK packaging and npm publishing
 
 See also:
@@ -117,6 +117,7 @@ Current KSB protocol routes:
 - `POST /api/v1/cron/dispatch-verifiers`
 - `POST /api/v1/cron/rebuild-party-history`
 - `GET /api/v1/verifier-rules`
+- `POST /api/v1/verifier-rules`
 
 Details live in `docs/KSB_API_V1.md`.
 

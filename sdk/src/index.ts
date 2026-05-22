@@ -269,6 +269,28 @@ export interface KsbVerifierRuleRecord {
   source: 'builtin' | 'custom';
 }
 
+export interface RegisterVerifierRuleInput {
+  name: string;
+  webhookUrl: string;
+  description?: string | null;
+  verifierPublicKey?: string | null;
+  defaultTimeoutMs?: number | null;
+  schemaJson?: JsonValue | null;
+}
+
+export interface RegisteredVerifierRule {
+  name: string;
+  appId: string;
+  description: string;
+  verifierType: 'webhook';
+  webhookUrl: string;
+  verifierPublicKey: string | null;
+  defaultTimeoutMs: number;
+  schemaJson: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface KsbCronRunResult {
   action: 'resolve-expired' | 'auto-verify' | 'rebuild-party-history' | 'dispatch-verifiers';
   scanned: number;
@@ -487,5 +509,12 @@ export class KsbClient {
 
   listVerifierRules() {
     return this.request<{ rules: KsbVerifierRuleRecord[] }>('/api/v1/verifier-rules');
+  }
+
+  registerVerifierRule(input: RegisterVerifierRuleInput) {
+    return this.request<RegisteredVerifierRule>('/api/v1/verifier-rules', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }, 'app');
   }
 }

@@ -23,9 +23,11 @@ import type {
   DispatchKsbVerificationInput,
   KsbDispatchResult,
   KsbVerifierRuleOutcome,
+  RegisterVerifierRuleInput,
+  RegisteredVerifierRule,
 } from './types';
 import { BUILT_IN_VERIFIER_RULES, isBuiltInVerifierRule } from './verifier-rules';
-import { executeVerifierRule } from './verifier-hub';
+import { executeVerifierRule, executeWebhookVerifier } from './verifier-hub';
 import { collectRuleSpecs, evaluateBondStatus, parseRuleSetConfig, type RuleSpec } from './rule-sets';
 
 function makeAppId() {
@@ -697,6 +699,154 @@ function parseVerifierRuleSpecs(verifierConfigJson: string): RuleSpec[] {
   return collectRuleSpecs(parseRuleSetConfig(verifierConfigJson));
 }
 
+interface CustomVerifierBinding {
+  webhookUrl: string;
+  verifierPublicKey: string | null;
+  defaultTimeoutMs: number;
+}
+
+function rowToRegisteredVerifierRule(verifierRow: any, ruleRow: any): RegisteredVerifierRule {
+  return {
+    name: String(verifierRow.rule_name),
+    appId: String(verifierRow.app_id),
+    description: String(ruleRow.description),
+    verifierType: 'webhook',
+    webhookUrl: String(verifierRow.webhook_url),
+    verifierPublicKey: verifierRow.verifier_public_key ?? null,
+    defaultTimeoutMs: Number(ruleRow.default_timeout_ms),
+    schemaJson: String(ruleRow.schema_json),
+    createdAt: String(verifierRow.created_at),
+    updatedAt: String(verifierRow.updated_at),
+  };
+}
+
+/**
+ * Register a custom verifier: a named rule bound to an app-owned signed
+ * webhook. The rule definition is stored in `ksb_verifier_rules` and the
+ * webhook binding in `ksb_custom_verifiers`. Built-in rule names are reserved,
+ * and a rule already owned by another app cannot be reclaimed.
+ */
+export async function registerCustomVerifier(
+  db: any,
+  appId: string,
+  input: RegisterVerifierRuleInput,
+): Promise<RegisteredVerifierRule> {
+  const name = input.name?.trim();
+  if (!name) {
+    throw new Error('Verifier rule name is required');
+  }
+  if (!/^[a-z0-9_]+$/i.test(name)) {
+    throw new Error('Verifier rule name must contain only letters, digits, and underscores');
+  }
+  if (isBuiltInVerifierRule(name)) {
+    throw new Error(`"${name}" is a built-in protocol rule and cannot be registered as a custom verifier`);
+  }
+
+  const webhookUrl = input.webhookUrl?.trim();
+  if (!webhookUrl) {
+    throw new Error('webhookUrl is required');
+  }
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(webhookUrl);
+  } catch {
+    throw new Error('webhookUrl must be a valid absolute URL');
+  }
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    throw new Error('webhookUrl must use http or https');
+  }
+
+  const verifierPublicKey = input.verifierPublicKey?.trim() || null;
+  const description = input.description?.trim() || `Custom webhook verifier registered by ${appId}`;
+  const schemaJson = normalizeJsonInput(input.schemaJson ?? null, 'schemaJson', false) ?? '{}';
+  const defaultTimeoutMs = Number.isFinite(Number(input.defaultTimeoutMs)) && Number(input.defaultTimeoutMs) > 0
+    ? Math.min(Math.floor(Number(input.defaultTimeoutMs)), 120000)
+    : 30000;
+
+  const appResult = await (db as any).$client.execute({
+    sql: `SELECT app_id FROM ksb_registered_apps WHERE app_id = :appId LIMIT 1`,
+    args: { appId },
+  });
+  if (!appResult.rows[0]) {
+    throw new Error(`Registered app not found: ${appId}`);
+  }
+
+  const ownerResult = await (db as any).$client.execute({
+    sql: `SELECT app_id FROM ksb_custom_verifiers WHERE rule_name = :name LIMIT 1`,
+    args: { name },
+  });
+  const existingOwner = ownerResult.rows[0];
+  if (existingOwner && String(existingOwner.app_id) !== appId) {
+    throw new Error(`Verifier rule "${name}" is already registered by another app`);
+  }
+
+  // The rule definition row satisfies the ksb_custom_verifiers foreign key.
+  await (db as any).$client.execute({
+    sql: `
+      INSERT INTO ksb_verifier_rules (name, description, schema_json, verifier_type, default_timeout_ms)
+      VALUES (:name, :description, :schemaJson, 'webhook', :defaultTimeoutMs)
+      ON CONFLICT(name) DO UPDATE SET
+        description = excluded.description,
+        schema_json = excluded.schema_json,
+        verifier_type = 'webhook',
+        default_timeout_ms = excluded.default_timeout_ms
+    `,
+    args: { name, description, schemaJson, defaultTimeoutMs },
+  });
+
+  await (db as any).$client.execute({
+    sql: `
+      INSERT INTO ksb_custom_verifiers (rule_name, app_id, webhook_url, verifier_public_key)
+      VALUES (:name, :appId, :webhookUrl, :verifierPublicKey)
+      ON CONFLICT(rule_name) DO UPDATE SET
+        webhook_url = excluded.webhook_url,
+        verifier_public_key = excluded.verifier_public_key
+    `,
+    args: { name, appId, webhookUrl, verifierPublicKey },
+  });
+
+  const [verifierResult, ruleResult] = await Promise.all([
+    (db as any).$client.execute({ sql: `SELECT * FROM ksb_custom_verifiers WHERE rule_name = :name LIMIT 1`, args: { name } }),
+    (db as any).$client.execute({ sql: `SELECT * FROM ksb_verifier_rules WHERE name = :name LIMIT 1`, args: { name } }),
+  ]);
+
+  return rowToRegisteredVerifierRule(verifierResult.rows[0], ruleResult.rows[0]);
+}
+
+/** Load the webhook bindings for a set of rule names, keyed by rule name. */
+async function getCustomVerifierMap(db: any, ruleNames: string[]): Promise<Map<string, CustomVerifierBinding>> {
+  const map = new Map<string, CustomVerifierBinding>();
+  const names = Array.from(new Set(ruleNames.filter(Boolean)));
+  if (names.length === 0) {
+    return map;
+  }
+
+  const placeholders = names.map((_, index) => `:r${index}`).join(', ');
+  const args: Record<string, unknown> = {};
+  names.forEach((name, index) => {
+    args[`r${index}`] = name;
+  });
+
+  const result = await (db as any).$client.execute({
+    sql: `
+      SELECT cv.rule_name, cv.webhook_url, cv.verifier_public_key, vr.default_timeout_ms
+      FROM ksb_custom_verifiers cv
+      JOIN ksb_verifier_rules vr ON vr.name = cv.rule_name
+      WHERE cv.rule_name IN (${placeholders})
+    `,
+    args,
+  });
+
+  for (const row of result.rows) {
+    map.set(String(row.rule_name), {
+      webhookUrl: String(row.webhook_url),
+      verifierPublicKey: row.verifier_public_key ?? null,
+      defaultTimeoutMs: Number(row.default_timeout_ms),
+    });
+  }
+  return map;
+}
+
 /**
  * Verifier hub dispatch for a single bond.
  *
@@ -723,6 +873,8 @@ export async function dispatchKsbBondVerifications(
     throw new Error('verifierConfigJson declares no verifier rules to dispatch');
   }
 
+  const customVerifiers = await getCustomVerifierMap(db, specs.map((spec) => spec.ruleName));
+
   const inputMap = new Map<string, Record<string, unknown>>();
   for (const entry of input.inputs ?? []) {
     const name = entry.ruleName?.trim();
@@ -735,16 +887,28 @@ export async function dispatchKsbBondVerifications(
   const outcomes: KsbVerifierRuleOutcome[] = [];
 
   for (const spec of specs) {
-    await ensureVerifierRule(db, {
-      ruleName: spec.ruleName,
-      verifierType: spec.verifierType,
-      description: spec.description,
-      schemaJson: spec.schemaJson,
-    });
+    const custom = customVerifiers.get(spec.ruleName);
+
+    // Registered custom verifiers already own their ksb_verifier_rules row;
+    // only synthesize a row for built-in or config-declared rules.
+    if (!custom) {
+      await ensureVerifierRule(db, {
+        ruleName: spec.ruleName,
+        verifierType: spec.verifierType,
+        description: spec.description,
+        schemaJson: spec.schemaJson,
+      });
+    }
 
     const params = { ...spec.params, ...(inputMap.get(spec.ruleName) ?? {}) };
+    const verifierType = custom ? 'webhook' : spec.verifierType;
     const startedAt = Date.now();
-    const execution = await executeVerifierRule(spec.ruleName, params, ctx);
+    const execution = custom
+      ? await executeWebhookVerifier(
+          { webhookUrl: custom.webhookUrl, verifierPublicKey: custom.verifierPublicKey, timeoutMs: custom.defaultTimeoutMs },
+          { bondId: bond.id, publicId: bond.publicId, ruleName: spec.ruleName, deadlineUnix: bond.deadlineUnix, params },
+        )
+      : await executeVerifierRule(spec.ruleName, params, ctx);
     const durationMs = Date.now() - startedAt;
     const evidenceJson = JSON.stringify({
       ...execution.evidence,
@@ -754,7 +918,7 @@ export async function dispatchKsbBondVerifications(
 
     outcomes.push({
       ruleName: spec.ruleName,
-      verifierType: spec.verifierType,
+      verifierType,
       result: execution.result,
       evidenceJson,
       durationMs,

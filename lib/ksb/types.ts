@@ -145,6 +145,28 @@ export interface KsbVerifierRuleRecord {
   source: 'builtin' | 'custom';
 }
 
+export interface RegisterVerifierRuleInput {
+  name: string;
+  webhookUrl: string;
+  description?: string | null;
+  verifierPublicKey?: string | null;
+  defaultTimeoutMs?: number | null;
+  schemaJson?: string | Record<string, unknown> | null;
+}
+
+export interface RegisteredVerifierRule {
+  name: string;
+  appId: string;
+  description: string;
+  verifierType: 'webhook';
+  webhookUrl: string;
+  verifierPublicKey: string | null;
+  defaultTimeoutMs: number;
+  schemaJson: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface KsbSlashingEventRecord {
   id: string;
   bondId: string;
